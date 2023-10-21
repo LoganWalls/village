@@ -3,11 +3,12 @@
 
 :root {
   --brand: color-mix(in lch, var(--pink-4), var(--orange-4));
-  --main-gradient: var(--gradient-25);
+  --transparent-gradient: linear-gradient(var(--surface-2), var(--surface-2));
+  --main-gradient: var(--gradient-25) var(--brand);
   --main-gradient-animation: gradient 5s ease infinite;
   @media (prefers-color-scheme: dark) {
     --brand: color-mix(in lch, var(--violet-2), var(--pink-2));
-    --main-gradient: var(--gradient-26);
+    --main-gradient: var(--gradient-26) var(--brand);
   }
 }
 
@@ -78,9 +79,13 @@
   padding: var(--size-2);
   mask: var(--mask-url);
   -webkit-mask: var(--mask-url);
-  background: var(--main-gradient);
   background-size: 400% 400%;
   animation: var(--main-gradient-animation);
+  background-color: var(--surface-2);
+}
+
+.textSendButton:not([disabled]) > .textSendIcon {
+  background: var(--main-gradient);
 }
 
 .textSendButton {
@@ -93,6 +98,8 @@
   aspect-ratio: var(--ratio-square);
   height: "auto";
   padding: var(--size-2);
+  box-shadow: var(--shadow-2);
+
   &:before {
     content: "";
     position: absolute;
@@ -103,11 +110,20 @@
     z-index: -1;
     margin: calc(0px - var(--button-border));
     border-radius: inherit;
-    background: var(--main-gradient);
+    opacity: 1.0;
     background-size: 400% 400%;
+    background: var(--main-gradient);
     animation: var(--main-gradient-animation);
+    transition: opacity 500ms var(--ease-1);
+  }
+  &:disabled {
+    box-shadow: unset;
+    &:before {
+      opacity: 0.0;
+    }
   }
   transition-duration: 500ms;
+  transition-delay: 300ms;
   transition-timing-function: var(--ease-1);
-  transition-property: background, box-shadow;
+  transition-property: opacity, background, border, box-shadow;
 }

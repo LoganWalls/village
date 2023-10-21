@@ -1,15 +1,21 @@
-import { onMount, type Component } from "solid-js";
+import { onMount, type Component, createSignal, Accessor } from "solid-js";
 import styles from "./App.module.css";
 
 const ChatWindow: Component = () => {
+  const [messages, setMessages] = createSignal<any[]>([]);
   return (
     <div class={styles.ChatWindow}>
+      <MessageHistory messages={messages} />
       <InputBar />
     </div>
   );
 };
 
 export default ChatWindow;
+
+const MessageHistory: Component<{ messages: Accessor<any[]> }> = (props) => {
+  return <div>{props.messages().toString()}</div>;
+};
 
 const InputBar: Component = () => {
   // Auto-adjust the size of the text-area
@@ -25,6 +31,8 @@ const InputBar: Component = () => {
     }
   });
 
+  const [content, setContent] = createSignal("");
+
   return (
     <div class={styles.InputBar}>
       <textarea
@@ -33,9 +41,16 @@ const InputBar: Component = () => {
         placeholder="Type something here..."
         class={styles.textInput}
         name="message"
-        onInput={(e) => autosize(e.target)}
+        onInput={(e) => {
+          autosize(e.target);
+          setContent(e.target.value);
+        }}
       ></textarea>
-      <button class={styles.textSendButton} type="submit">
+      <button
+        class={styles.textSendButton}
+        type="submit"
+        disabled={content() == ""}
+      >
         <div class={styles.textSendIcon}></div>
       </button>
     </div>
