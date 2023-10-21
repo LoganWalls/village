@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <title>Village AI</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="style/open-props-normalize.min.css" rel="stylesheet" />
+  <link href="style/custom.css" rel="stylesheet" />
+  <script src="script/htmx-core.min.js"></script>
+  <script src="script/htmx-ws.js"></script>
+  <script>
+  // Auto-adjust the size of the text-area
+  function autosize(element) {
+    element.style.height = element.scrollHeight + "px";
+  }
+  // Set the intial size when the page loads
+  window.addEventListener("load", () =>  autosize(document.querySelector(".text-input")));
+  </script>
+</head>
+
+<body>
+  <div hx-ext="ws" ws-connect="/ws-chat">
+    <div id="history"></div>
+    <form id="form" ws-send>
+      <div class="input-bar">
+        <textarea rows="1" cols="80" placeholder="Type something here..." class="text-input" name="message" oninput="autosize(this)"></textarea>
+          <button class="text-send-button" type="submit">
+            <div class="text-send-icon"></div>
+          </button>
+      </div>
+    </form>
+  </div>
+</body>
+
+</html>
