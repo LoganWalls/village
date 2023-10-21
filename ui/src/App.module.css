@@ -13,6 +13,7 @@
 
 .App {
   padding: var(--size-fluid-2);
+  height: 100vh;
 }
 
 
@@ -28,9 +29,17 @@
   }
 }
 
-.inputBar {
+.ChatWindow {
   display: flex;
   flex-direction: row;
+  height: 100%;
+  width: 100%;
+}
+
+.InputBar {
+  display: flex;
+  flex-direction: row;
+  align-self: flex-end;
   align-content: center;
   align-items: center;
   gap: var(--size-fluid-1);
@@ -82,7 +91,7 @@
   border: var(--button-border) solid transparent;
   border-radius: var(--radius-round);
   aspect-ratio: var(--ratio-square);
-  height: 100%;
+  height: "auto";
   padding: var(--size-2);
   &:before {
     content: "";
