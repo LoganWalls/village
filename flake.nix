@@ -15,9 +15,10 @@
         devShells.${system}.default =
           pkgs.mkShell
           {
-            packages = [
-              pkgs.python310
-              pkgs.poetry
+            packages = with pkgs; [
+              python310
+              poetry
+              nodePackages.pnpm
             ];
 
             LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath [
