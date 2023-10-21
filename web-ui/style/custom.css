@@ -1,10 +1,12 @@
 @import "./open-props.min.css";
 
 :root {
-  --main-gradient: var(--gradient-25);
+  --OSdark: 0;
   --brand: color-mix(in lch, var(--pink-4), var(--orange-4));
-  @media (--OSdark) {
-    --main-gradient: var(--gradient-17);
+  --main-gradient: var(--gradient-25);
+  @media (prefers-color-scheme:dark) {
+    --brand: color-mix(in lch, var(--violet-2), var(--pink-2));
+    --main-gradient: var(--gradient-26);
   }
 }
 
@@ -20,13 +22,13 @@ body {
 
 .text-input {
   display: flex;
+  resize: none;
+  overflow: hidden;
   width: 100%;
   max-width: 100%;
   padding: var(--size-fluid-1);
-  resize: none;
   box-shadow: var(--shadow-1);
   border: var(--border-size-1) solid transparent;
-  overflow: hidden;
   &:focus {
     outline: none !important;
     border-color: var(--surface-2);
