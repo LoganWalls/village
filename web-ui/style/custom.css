@@ -4,9 +4,22 @@
   --OSdark: 0;
   --brand: color-mix(in lch, var(--pink-4), var(--orange-4));
   --main-gradient: var(--gradient-25);
-  @media (prefers-color-scheme:dark) {
+  --main-gradient-animation: gradient 5s ease infinite;
+  @media (prefers-color-scheme: dark) {
     --brand: color-mix(in lch, var(--violet-2), var(--pink-2));
     --main-gradient: var(--gradient-26);
+  }
+}
+
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
   }
 }
 
@@ -31,22 +44,35 @@ body {
   max-height: 40vh;
   padding: var(--size-fluid-1);
   box-shadow: var(--shadow-1);
-  border: var(--border-size-1) solid transparent;
-  &:focus {
+  border: var(--border-size-1) solid var(--surface-2);
+  background-color: var(--surface-1);
+  &:focus, &:hover {
     outline: none !important;
-    border-color: var(--surface-2);
+    border-color: var(--surface-3);
+    box-shadow: var(--shadow-2);
   }
+  transition-duration: 500ms;
+  transition-timing-function: var(--ease-1);
+  transition-property: border-color, box-shadow;
 }
 
 .text-send-icon {
-  width: var(--font-size-fluid-1);
-  height: var(--font-size-fluid-1);
+  height: var(--size-1);
+  aspect-ratio: var(--ratio-square);
   padding: var(--size-2);
   mask: url("./send-icon.svg");
-  background-image: var(--main-gradient);
+  -webkit-mask: url("./send-icon.svg");
+  background: var(--main-gradient);
+  background-size: 400% 400%;
+  animation: var(--main-gradient-animation);
 }
 
 .text-send-button {
+  --button-border: var(--border-size-2);
+  position: relative;
+  background-color: var(--surface-1);
+  background-clip: padding-box;
+  border: var(--button-border) solid transparent;
   border-radius: var(--radius-round);
   aspect-ratio: var(--ratio-square);
   height: 100%;
@@ -55,4 +81,21 @@ body {
   &:hover {
     box-shadow: var(--shadow-3);
   }
+  &:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: -1;
+    margin: calc(0px - var(--button-border));
+    border-radius: inherit;
+    background: var(--main-gradient);
+    background-size: 400% 400%;
+    animation: var(--main-gradient-animation);
+  }
+  transition-duration: 500ms;
+  transition-timing-function: var(--ease-1);
+  transition-property: background, box-shadow;
 }
