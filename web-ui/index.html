@@ -13,7 +13,7 @@
     // Auto-adjust the size of the text-area
     function autosize(element) {
       element.style.height = 0;
-      element.style.height = `calc(${element.scrollHeight}px + var(--size-1))`
+      element.style.height = element.scrollHeight + "px";
     }
     // Set the intial size when the page loads
     window.addEventListener("load", () =>
