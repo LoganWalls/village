@@ -10,12 +10,15 @@
   <script src="script/htmx-core.min.js"></script>
   <script src="script/htmx-ws.js"></script>
   <script>
-  // Auto-adjust the size of the text-area
-  function autosize(element) {
-    element.style.height = element.scrollHeight + "px";
-  }
-  // Set the intial size when the page loads
-  window.addEventListener("load", () =>  autosize(document.querySelector(".text-input")));
+    // Auto-adjust the size of the text-area
+    function autosize(element) {
+      element.style.height = 0;
+      element.style.height = `calc(${element.scrollHeight}px + var(--size-1))`
+    }
+    // Set the intial size when the page loads
+    window.addEventListener("load", () =>
+      autosize(document.querySelector(".text-input")),
+    );
   </script>
 </head>
 
@@ -24,10 +27,11 @@
     <div id="history"></div>
     <form id="form" ws-send>
       <div class="input-bar">
-        <textarea rows="1" cols="80" placeholder="Type something here..." class="text-input" name="message" oninput="autosize(this)"></textarea>
-          <button class="text-send-button" type="submit">
-            <div class="text-send-icon"></div>
-          </button>
+        <textarea rows="1" cols="80" placeholder="Type something here..." class="text-input" name="message"
+          oninput="autosize(this)"></textarea>
+        <button class="text-send-button" type="submit">
+          <div class="text-send-icon"></div>
+        </button>
       </div>
     </form>
   </div>

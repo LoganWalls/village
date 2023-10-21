@@ -18,14 +18,17 @@ body {
   display: flex;
   flex-direction: row;
   gap: var(--size-fluid-1);
+  align-content: center;
+  align-items: center;
 }
 
 .text-input {
   display: flex;
   resize: none;
-  overflow: hidden;
+  overflow: scroll;
   width: 100%;
   max-width: 100%;
+  max-height: 40vh;
   padding: var(--size-fluid-1);
   box-shadow: var(--shadow-1);
   border: var(--border-size-1) solid transparent;
@@ -47,27 +50,9 @@ body {
   border-radius: var(--radius-round);
   aspect-ratio: var(--ratio-square);
   height: 100%;
-
-  /* border: var(--border-size-1) solid transparent; */
   padding: var(--size-2);
   box-shadow: var(--shadow-2);
   &:hover {
     box-shadow: var(--shadow-3);
   }
 }
-
-/* .text-input-submit-label { */
-/*   position: relative; */
-/*   display: flex; */
-/*   background-color: white; */
-/* } */
-
-/* .text-input-submit-label:before { */
-/*   color: white; */
-/*   content: ""; */
-/*   position: absolute; */
-/*   top: 0; */
-/*   bottom: 0; */
-/*   width: var(--font-size-fluid-1); */
-/*   background: url("./send-icon.svg"); */
-/* } */
