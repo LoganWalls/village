@@ -18,7 +18,7 @@ __all__ = ["stream_chat_message"]
 oai_chat = ChatOpenAI(
     openai_api_base="http://localhost:7777/v1",
     openai_api_key="sk-blah",
-    max_tokens=200,
+    max_tokens=2000,
     streaming=True,
 )
 prompt = ChatPromptTemplate.from_messages(
