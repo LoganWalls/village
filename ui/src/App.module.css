@@ -30,7 +30,7 @@
   }
 
   /* Common */
-  --brand: var(var(--user-color));
+  --brand: var(--ai-color);
   --ai-gradient-animation: gradient 5s ease infinite;
 }
 
