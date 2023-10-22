@@ -1,26 +1,8 @@
 @import "open-props/normalize";
 @import "open-props/style";
-
-:root {
-  --main-gradient-animation: gradient 5s ease infinite;
-
-  /* Light theme */
-  --text-1: color-mix(in lch, var(--pink-1), var(--orange-1));
-  --brand: color-mix(in lch, var(--pink-4), var(--orange-4));
-  --main-gradient: var(--gradient-25) var(--brand);
-
-  /* Dark theme */
-  @media (prefers-color-scheme: dark) {
-    --text-1: color-mix(in lch, var(--violet-1), var(--pink-1));
-    --brand: color-mix(in lch, var(--violet-2), var(--pink-2));
-    --main-gradient: var(--gradient-26) var(--brand);
-  }
-}
-
-.App {
-  padding: var(--size-fluid-2);
-  height: 100vh;
-}
+/* Pulling this from a CDN because of a bug:
+* https://github.com/argyleink/open-props/issues/431#issue-1955952470 */
+@import "https://unpkg.com/open-props/animations.min.css";
 
 @keyframes gradient {
   0% {
@@ -34,6 +16,35 @@
   }
 }
 
+:root {
+  /* Light theme */
+  --user-color: var(--cyan-2);
+  --ai-color: var(--violet-2);
+  --ai-gradient: var(--gradient-26) var(--ai-color);
+
+  /* Dark theme */
+  @media (prefers-color-scheme: dark) {
+    --user-color: var(--cyan-9);
+    --ai-color: var(--violet-9);
+    --ai-gradient: var(--gradient-17) var(--ai-color);
+  }
+
+  /* Common */
+  --brand: var(var(--user-color));
+  --ai-gradient-animation: gradient 5s ease infinite;
+}
+
+
+/* Make dark/light mode transition smooth */
+html, .textInput {
+  transition: background-color 500ms var(--ease-1);
+}
+
+.App {
+  padding: var(--size-fluid-2);
+  height: 100vh;
+}
+
 .ChatWindow {
   display: flex;
   flex-direction: column;
@@ -43,22 +54,35 @@
 
 .chatHistory {
   display: flex;
-  flex-direction: column;
   flex-grow: 8;
-  overflow-y: scroll;
+  padding: var(--size-fluid-2);
   gap: var(--size-2);
+  /* This keeps the messages scrolling as new content is added */
+  flex-direction: column-reverse;
+  overflow-y: scroll;
 }
 
 .ChatMessage {
+  display: flex;
   width: fit-content;
-  max-width: 90%;
+  max-width: 80%;
   border-radius: var(--radius-3);
   padding: var(--size-fluid-2);
+  /* fixes a positioning bug in iOS Safari */
+  transform: translateZ(0); 
 
-  color: var(--surface-1);
-  background: var(--main-gradient);
-  background-size: 200% 200%;
-  filter: brightness(85%);
+  background-size: 400% 400%;
+
+  &.ai {
+    background-color: var(--ai-color);
+    animation: var(--animation-slide-in-right);
+  }
+  &.user {
+    background-color: var(--user-color);
+    animation: var(--animation-slide-in-left);
+    margin-left: auto;
+  }
+  animation-duration: 800ms;
 }
 
 .InputBar {
@@ -103,12 +127,12 @@
   mask: var(--mask-url);
   -webkit-mask: var(--mask-url);
   background-size: 400% 400%;
-  animation: var(--main-gradient-animation);
+  animation: var(--ai-gradient-animation);
   background-color: var(--surface-2);
 }
 
 .textSendButton:not([disabled]) > .textSendIcon {
-  background: var(--main-gradient);
+  background: var(--ai-gradient);
 }
 
 .textSendButton {
@@ -135,8 +159,8 @@
     border-radius: inherit;
     opacity: 1;
     background-size: 400% 400%;
-    background: var(--main-gradient);
-    animation: var(--main-gradient-animation);
+    background: var(--ai-gradient);
+    animation: var(--ai-gradient-animation);
     transition: opacity 500ms var(--ease-1);
   }
   &:disabled {
@@ -146,7 +170,7 @@
     }
   }
   transition-duration: 500ms;
-  transition-delay: 300ms;
+  transition-delay: 300ms, 300ms, 0ms, 0ms;
   transition-timing-function: var(--ease-1);
-  transition-property: opacity, background, border, box-shadow;
+  transition-property: opacity, border, background-color, box-shadow;
 }
