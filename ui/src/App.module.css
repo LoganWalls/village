@@ -50,7 +50,6 @@ code {
 }
 
 .App {
-  padding: var(--size-fluid-2);
   height: 100vh;
 }
 
@@ -59,6 +58,7 @@ code {
   flex-direction: column;
   height: 100%;
   width: 100%;
+  padding: 0 var(--size-fluid-1) var(--size-fluid-1) var(--size-fluid-1);
 }
 
 .chatHistory {
@@ -103,7 +103,7 @@ code {
   gap: var(--size-fluid-1);
   padding: var(--size-fluid-1);
   box-shadow: var(--shadow-1);
-  border: var(--border-size-1) solid var(--surface-2);
+  border: var(--border-size-1) solid var(--surface-3);
   border-radius: var(--radius-3);
   &:focus,
   &:hover {
