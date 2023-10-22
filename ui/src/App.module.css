@@ -34,10 +34,19 @@
   --ai-gradient-animation: gradient 5s ease infinite;
 }
 
-
 /* Make dark/light mode transition smooth */
-html, .textInput {
+html,
+.textInput {
   transition: background-color 500ms var(--ease-1);
+}
+
+/* TODO: light + dark mode */
+/* TODO: refactor so hljs outputs a custom component */
+pre {
+  padding: var(--size-3);
+}
+code {
+  border-radius: var(--radius-2);
 }
 
 .App {
@@ -64,12 +73,13 @@ html, .textInput {
 
 .ChatMessage {
   display: flex;
+  flex-direction: column;
   width: fit-content;
   max-width: 80%;
   border-radius: var(--radius-3);
   padding: var(--size-fluid-2);
   /* fixes a positioning bug in iOS Safari */
-  transform: translateZ(0); 
+  transform: translateZ(0);
 
   background-size: 400% 400%;
 

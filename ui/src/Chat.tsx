@@ -1,19 +1,68 @@
 import { onMount, type Component, createSignal, Accessor, For } from "solid-js";
 import styles from "./App.module.css";
+import DOMPurify from "dompurify";
+import { Marked } from "marked";
+import { markedHighlight } from "marked-highlight";
+import hljs from "highlight.js";
+import "highlight.js/styles/github.css";
+
+// Configure marked to highlight code
+const marked = new Marked(
+  markedHighlight({
+    langPrefix: "hljs language-",
+    highlight(code, lang) {
+      const language = hljs.getLanguage(lang) ? lang : "plaintext";
+      return hljs.highlight(code, { language }).value;
+    },
+  }),
+);
+
+const codeExample = `
+Sure, here's an example code snippet that implements a simple Hello World web service using Axum:
+\`\`\`rust
+use axum::{routing::get, Json};
+use serde_json::json;
+
+#[derive(Debug)]
+struct MyResponse {
+    message: String,
+}
+
+#[tokio::main]
+async fn main() {
+    let app = get("/", |_| {
+        async move {
+            Ok(Json(MyResponse {
+                message: "Hello World!".to_string(),
+            }))
+        }
+    });
+
+    axum::Server::bind("127.0.0.1:3000")
+        .serve(app.into_make_service())
+        .await
+        .unwrap();
+}
+\`\`\`
+In this example, we're using the \`get()\` function to define a route that responds to GET requests on the root path (i.e., \`/\`). The implementation of this route is an asynchronous closure that returns a JSON-encoded response containing a message. We're then creating an Axum server and serving it on localhost:3000. Let me know if you have any questions or need further assistance!
+`;
 
 // TODO: replace with pydantic-generated model?
 // How to handle signal?
 interface ChatMessageData {
-  role: "ai" | "user"
-  message: Accessor<string>
+  role: "ai" | "user";
+  message: Accessor<string>;
 }
 
-function messageDataFromString(role: "ai" | "user", message: string): ChatMessageData{
+function messageDataFromString(
+  role: "ai" | "user",
+  message: string,
+): ChatMessageData {
   const [messageSignal] = createSignal(message);
   return {
     role,
-    message: messageSignal
-  }
+    message: messageSignal,
+  };
 }
 
 const ChatWindow: Component = () => {
@@ -25,7 +74,7 @@ const ChatWindow: Component = () => {
     const sentData: ChatMessageData = {
       role: "user",
       message: sentMessage,
-    }
+    };
     setMessages((prev) => [sentData, ...prev]);
 
     const response = await fetch("http://localhost:8000/chat/stream", {
@@ -38,7 +87,7 @@ const ChatWindow: Component = () => {
       const currentData: ChatMessageData = {
         role: "ai",
         message: currentMessage,
-      }
+      };
       setMessages((prev) => [currentData, ...prev]);
 
       // Type-casts are a work-around for typescript limitation:
@@ -57,11 +106,11 @@ const ChatWindow: Component = () => {
   return (
     <div class={styles.ChatWindow}>
       <div class={styles.chatHistory}>
-        <For each={messages()}>
-          {(data) => <ChatMessage data={data} />}
-        </For>
-        <ChatMessage data={messageDataFromString("ai", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus et cursus ligula. Donec at purus eu ante vestibulum commodo. Duis auctor luctus risus in sagittis. Suspendisse potenti. Nunc dapibus, lacus aliquet rhoncus commodo, dolor odio pharetra massa, nec efficitur eros tellus eu diam. Curabitur pellentesque vitae mi nec maximus. Maecenas sed fermentum massa, eget hendrerit sem. Nulla efficitur finibus feugiat. Vestibulum at velit in magna lobortis lacinia. Donec gravida nunc at erat sagittis cursus. Cras pretium sapien at varius sollicitudin. In hac habitasse platea dictumst. Duis at leo sit amet risus feugiat gravida vel eu lacus. Nunc semper, eros eget faucibus dignissim, dolor enim malesuada odio, vel euismod mauris orci id ante. Integer finibus leo nec orci lacinia ornare. Nulla facilisi. Vestibulum laoreet vehicula felis, non mattis enim scelerisque in. Proin nec condimentum elit, nec tempus elit. Pellentesque vel elit et nisi mollis consequat. Aliquam feugiat sed risus porta maximus. Vivamus tortor nisi, commodo a mattis eu, fermentum in purus. Vestibulum ante enim, pretium nec neque vel, hendrerit blandit augue. Donec accumsan sapien nisi, quis interdum magna commodo ut. Aliquam ut vehicula nibh. Sed feugiat id massa non cursus. Aenean vulputate sodales nisl, id sagittis sapien aliquam vel. Proin eget sapien interdum, molestie arcu eget, ullamcorper nisi. Etiam ullamcorper, lectus at luctus rutrum, sapien sapien dignissim turpis, sit amet accumsan dui mauris at odio. ")} />
-        <ChatMessage data={messageDataFromString("user", "Test 1")} />
+        <For each={messages()}>{(data) => <ChatMessage data={data} />}</For>
+        <ChatMessage
+          data={messageDataFromString("ai", codeExample)}
+        />
+        <ChatMessage data={messageDataFromString("user", "Can you write a hello world in rust using axum?")} />
       </div>
       <InputBar sendMessage={sendMessage} />
     </div>
@@ -70,16 +119,25 @@ const ChatWindow: Component = () => {
 
 export default ChatWindow;
 
-const ChatMessage: Component<{ data: ChatMessageData }> = (
-  props,
-) => {
-  const data = props.data
-  // TODO: take in user vs. bot and format messages accordingly
-  return <div classList={{
-    [styles.ChatMessage]: true,
-    [styles.ai]: data.role == "ai",
-    [styles.user]: data.role == "user",
-  }}>{data.message()}</div>;
+const ChatMessage: Component<{ data: ChatMessageData }> = (props) => {
+  const role = props.data.role;
+  const markdown = () => {
+    const message = props.data
+      .message()
+      // Remove zero-width characters that mess with marked
+      .replace(/^[\u200B\u200C\u200D\u200E\u200F\uFEFF]/, "");
+    return DOMPurify.sanitize(marked.parse(message));
+  };
+  return (
+    <div
+      classList={{
+        [styles.ChatMessage]: true,
+        [styles.ai]: role == "ai",
+        [styles.user]: role == "user",
+      }}
+      innerHTML={markdown()}
+    ></div>
+  );
 };
 
 const InputBar: Component<{ sendMessage: (m: string) => void }> = (props) => {
