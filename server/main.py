@@ -1,39 +1,26 @@
-from fastapi import FastAPI, WebSocket
-from fastapi.responses import HTMLResponse
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
 from fastapi.staticfiles import StaticFiles
-from langchain.chat_models import ChatOpenAI
-from langchain.schema import HumanMessage, SystemMessage
+
+from . import chat, config
 
 app = FastAPI()
-oai = ChatOpenAI(
-    openai_api_base="http://localhost:7777/v1",
-    openai_api_key="sk-blah",
-    max_tokens=200,
+origins = [config.UI_DEV_URL]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
-
-@app.get("/foo")
-async def root():
-    return {"message": "Hello World"}
-
-
-@app.websocket("/ws-chat")
-async def websocket_endpoint(websocket: WebSocket):
-    await websocket.accept()
-    while True:
-        data: dict = await websocket.receive_json()
-        message = data["message"]
-        chunk_stream = oai.astream(
-            [
-                SystemMessage(content="You are a helpful AI assistant named Zephyr."),
-                HumanMessage(content=message),
-            ]
-        )
-        async for chunk in chunk_stream:
-            await websocket.send_text(
-                f'<div id="history" hx-swap-oob="beforeend">{chunk.content}</div>'
-            )
-
+@app.post("/chat/stream")
+async def chat_stream(request: chat.ChatStreamRequest):
+    return StreamingResponse(
+        chat.stream_chat_message(request.message),
+        media_type="text/event-stream",
+    )
 
 # Declare static files at the end because order matters in FastAPI:
 # https://fastapi.tiangolo.com/tutorial/path-params/?h=order+matters#order-matters

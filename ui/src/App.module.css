@@ -2,11 +2,16 @@
 @import "open-props/style";
 
 :root {
-  --brand: color-mix(in lch, var(--pink-4), var(--orange-4));
-  --transparent-gradient: linear-gradient(var(--surface-2), var(--surface-2));
-  --main-gradient: var(--gradient-25) var(--brand);
   --main-gradient-animation: gradient 5s ease infinite;
+
+  /* Light theme */
+  --text-1: color-mix(in lch, var(--pink-1), var(--orange-1));
+  --brand: color-mix(in lch, var(--pink-4), var(--orange-4));
+  --main-gradient: var(--gradient-25) var(--brand);
+
+  /* Dark theme */
   @media (prefers-color-scheme: dark) {
+    --text-1: color-mix(in lch, var(--violet-1), var(--pink-1));
     --brand: color-mix(in lch, var(--violet-2), var(--pink-2));
     --main-gradient: var(--gradient-26) var(--brand);
   }
@@ -16,7 +21,6 @@
   padding: var(--size-fluid-2);
   height: 100vh;
 }
-
 
 @keyframes gradient {
   0% {
@@ -32,15 +36,34 @@
 
 .ChatWindow {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   height: 100%;
   width: 100%;
+}
+
+.chatHistory {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 8;
+  overflow-y: scroll;
+  gap: var(--size-2);
+}
+
+.ChatMessage {
+  width: fit-content;
+  max-width: 90%;
+  border-radius: var(--radius-3);
+  padding: var(--size-fluid-2);
+
+  color: var(--surface-1);
+  background: var(--main-gradient);
+  background-size: 200% 200%;
+  filter: brightness(85%);
 }
 
 .InputBar {
   display: flex;
   flex-direction: row;
-  align-self: flex-end;
   align-content: center;
   align-items: center;
   gap: var(--size-fluid-1);
@@ -110,7 +133,7 @@
     z-index: -1;
     margin: calc(0px - var(--button-border));
     border-radius: inherit;
-    opacity: 1.0;
+    opacity: 1;
     background-size: 400% 400%;
     background: var(--main-gradient);
     animation: var(--main-gradient-animation);
@@ -119,7 +142,7 @@
   &:disabled {
     box-shadow: unset;
     &:before {
-      opacity: 0.0;
+      opacity: 0;
     }
   }
   transition-duration: 500ms;
