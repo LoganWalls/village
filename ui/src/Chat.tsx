@@ -4,7 +4,8 @@ import DOMPurify from "dompurify";
 import { Marked } from "marked";
 import { markedHighlight } from "marked-highlight";
 import hljs from "highlight.js";
-import "highlight.js/styles/github.css";
+import syntaxThemeLight from "highlight.js/styles/atom-one-light.min.css?url"
+import syntaxThemeDark from "highlight.js/styles/atom-one-dark.min.css?url"
 
 // Configure marked to highlight code
 const marked = new Marked(
@@ -102,8 +103,20 @@ const ChatWindow: Component = () => {
       // TODO: show errors in UI
     }
   };
-  // createEffect(() => console.log(messages()));
+
   return (
+    <>
+      <link
+        rel="stylesheet"
+        href={syntaxThemeLight}
+        media="screen and (prefers-color-scheme: light)"
+      />
+      <link
+        rel="stylesheet"
+        href={syntaxThemeDark}
+        media="screen and (prefers-color-scheme: dark)"
+      />
+
     <div class={styles.ChatWindow}>
       <div class={styles.chatHistory}>
         <For each={messages()}>{(data) => <ChatMessage data={data} />}</For>
@@ -114,6 +127,7 @@ const ChatWindow: Component = () => {
       </div>
       <InputBar sendMessage={sendMessage} />
     </div>
+    </>
   );
 };
 
@@ -126,7 +140,7 @@ const ChatMessage: Component<{ data: ChatMessageData }> = (props) => {
       .message()
       // Remove zero-width characters that mess with marked
       .replace(/^[\u200B\u200C\u200D\u200E\u200F\uFEFF]/, "");
-    return DOMPurify.sanitize(marked.parse(message));
+    return DOMPurify.sanitize(marked.parse(message) as string);
   };
   return (
     <div

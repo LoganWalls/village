@@ -4,18 +4,6 @@
 * https://github.com/argyleink/open-props/issues/431#issue-1955952470 */
 @import "https://unpkg.com/open-props/animations.min.css";
 
-@keyframes gradient {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
-
 :root {
   /* Light theme */
   --user-color: var(--cyan-2);
@@ -32,6 +20,18 @@
   /* Common */
   --brand: var(--ai-color);
   --ai-gradient-animation: gradient 5s ease infinite;
+}
+
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 /* Make dark/light mode transition smooth */
