@@ -93,10 +93,10 @@ const ChatWindow: Component = () => {
       const reader = response.body.pipeThrough(new TextDecoderStream()).getReader()
       while (true) {
         const {done, value} = await reader.read();
-        setCurrentMessage((prev) => prev + value);
         if (done){
           break
         }
+        setCurrentMessage((prev) => prev + value);
       }
     } else {
       // TODO: show errors in UI
