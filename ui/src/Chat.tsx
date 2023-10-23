@@ -90,14 +90,13 @@ const ChatWindow: Component = () => {
         message: currentMessage,
       };
       setMessages((prev) => [currentData, ...prev]);
-
-      // Type-casts are a work-around for typescript limitation:
-      // https://github.com/microsoft/TypeScript/issues/29867
-      const stream = response.body.pipeThrough(
-        new TextDecoderStream(),
-      ) as unknown as AsyncIterable<string>;
-      for await (const chunk of stream) {
-        setCurrentMessage((prev) => prev + chunk);
+      const reader = response.body.pipeThrough(new TextDecoderStream()).getReader()
+      while (true) {
+        const {done, value} = await reader.read();
+        setCurrentMessage((prev) => prev + value);
+        if (done){
+          break
+        }
       }
     } else {
       // TODO: show errors in UI
