@@ -1,0 +1,107 @@
+.ChatWindow {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  padding: 0 var(--size-fluid-1) var(--size-fluid-1) var(--size-fluid-1);
+}
+
+.chatHistory {
+  display: flex;
+  flex-grow: 8;
+  padding: var(--size-fluid-2);
+  gap: var(--size-2);
+  /* This keeps the messages scrolling as new content is added */
+  flex-direction: column-reverse;
+  overflow-y: scroll;
+}
+
+.InputBar {
+  display: flex;
+  flex-direction: row;
+  align-content: center;
+  align-items: center;
+  gap: var(--size-fluid-1);
+  padding: var(--size-fluid-1);
+  box-shadow: var(--shadow-1);
+  border: var(--border-size-1) solid var(--surface-3);
+  border-radius: var(--radius-3);
+  &:focus,
+  &:hover {
+    outline: none !important;
+    border-color: var(--surface-3);
+    box-shadow: var(--shadow-2);
+  }
+  transition-duration: 500ms;
+  transition-timing-function: var(--ease-1);
+  transition-property: border-color, box-shadow;
+}
+
+.textInput {
+  display: flex;
+  resize: none;
+  overflow: scroll;
+  width: 100%;
+  max-width: 100%;
+  max-height: 40vh;
+  background-color: var(--surface-1);
+  &:focus {
+    outline: none !important;
+  }
+}
+
+.textSendIcon {
+  --mask-url: url("../assets/send-icon.svg");
+  height: var(--size-1);
+  aspect-ratio: var(--ratio-square);
+  padding: var(--size-2);
+  mask: var(--mask-url);
+  -webkit-mask: var(--mask-url);
+  background-size: 400% 400%;
+  animation: var(--ai-gradient-animation);
+  background-color: var(--surface-2);
+}
+
+.textSendButton:not([disabled]) > .textSendIcon {
+  background: var(--ai-gradient);
+}
+
+.textSendButton {
+  --button-border: var(--border-size-2);
+  position: relative;
+  background-color: var(--surface-1);
+  background-clip: padding-box;
+  border: var(--button-border) solid transparent;
+  border-radius: var(--radius-round);
+  aspect-ratio: var(--ratio-square);
+  height: "auto";
+  padding: var(--size-2);
+  box-shadow: var(--shadow-2);
+
+  &:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: -1;
+    margin: calc(0px - var(--button-border));
+    border-radius: inherit;
+    opacity: 1;
+    background-size: 400% 400%;
+    background: var(--ai-gradient);
+    animation: var(--ai-gradient-animation);
+    transition: opacity 500ms var(--ease-1);
+  }
+  &:disabled {
+    box-shadow: unset;
+    &:before {
+      opacity: 0;
+    }
+  }
+  transition-duration: 500ms;
+  transition-delay: 300ms, 300ms, 0ms, 0ms;
+  transition-timing-function: var(--ease-1);
+  transition-property: opacity, border, background-color, box-shadow;
+}

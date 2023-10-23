@@ -1,12 +1,12 @@
 import { type Component } from "solid-js";
 
 import styles from "./App.module.css";
-import ChatWindow from "./Chat";
+import ChatWindow from "./components/ChatWindow";
 
 const App: Component = () => {
   return (
     <div class={styles.App}>
-      <ChatWindow/>
+      <ChatWindow />
     </div>
   );
 };
