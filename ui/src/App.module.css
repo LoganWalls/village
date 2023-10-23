@@ -43,9 +43,12 @@ html,
 /* TODO: light + dark mode */
 /* TODO: refactor so hljs outputs a custom component */
 pre {
+  width: 100%;
   padding: var(--size-3);
+  max-inline-size: unset;
 }
 code {
+  width: 100%;
   border-radius: var(--radius-2);
 }
 
