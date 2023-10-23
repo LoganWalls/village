@@ -21,6 +21,7 @@
     "highlight.js": "^11.9.0",
     "marked": "^9.1.2",
     "marked-highlight": "^2.0.6",
+    "marked-katex-extension": "^4.0.2",
     "open-props": "^1.6.8",
     "solid-js": "^1.7.6"
   }

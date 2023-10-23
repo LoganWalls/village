@@ -3,12 +3,19 @@ import styles from "./App.module.css";
 import DOMPurify from "dompurify";
 import { Marked } from "marked";
 import { markedHighlight } from "marked-highlight";
+import markedKatex from "marked-katex-extension";
 import hljs from "highlight.js";
 import syntaxThemeLight from "highlight.js/styles/atom-one-light.min.css?url"
 import syntaxThemeDark from "highlight.js/styles/atom-one-dark.min.css?url"
+import katexStyles from "./assets/katex.min.css?url";
 
 // Configure marked to highlight code
 const marked = new Marked(
+  // Put katex before highlight so that it can
+  // catch ```latex code blocks.
+  markedKatex({
+    throwOnError: false,
+  }),
   markedHighlight({
     langPrefix: "hljs language-",
     highlight(code, lang) {
@@ -107,6 +114,10 @@ const ChatWindow: Component = () => {
     <>
       <link
         rel="stylesheet"
+        href={katexStyles}
+      />
+      <link
+        rel="stylesheet"
         href={syntaxThemeLight}
         media="screen and (prefers-color-scheme: light)"
       />
@@ -115,14 +126,9 @@ const ChatWindow: Component = () => {
         href={syntaxThemeDark}
         media="screen and (prefers-color-scheme: dark)"
       />
-
     <div class={styles.ChatWindow}>
       <div class={styles.chatHistory}>
         <For each={messages()}>{(data) => <ChatMessage data={data} />}</For>
-        <ChatMessage
-          data={messageDataFromString("ai", codeExample)}
-        />
-        <ChatMessage data={messageDataFromString("user", "Can you write a hello world in rust using axum?")} />
       </div>
       <InputBar sendMessage={sendMessage} />
     </div>
