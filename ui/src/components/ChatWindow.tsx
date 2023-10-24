@@ -101,6 +101,7 @@ const InputBar: Component<{ sendMessage: (m: string) => void }> = (props) => {
           if (!textInputRef) return;
           textInputRef.value = "";
           setContent("");
+          autosize(textInputRef);
         }}
         disabled={content() == ""}
       >
