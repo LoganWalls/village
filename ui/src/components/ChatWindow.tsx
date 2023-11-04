@@ -32,7 +32,9 @@ const ChatWindow: Component = () => {
         if (done){
           break
         }
-        setCurrentMessage((prev) => prev + value);
+        for (let char of value) {
+          setCurrentMessage((prev) => prev + char);
+        }
       }
     } else {
       // TODO: show errors in UI
