@@ -1,10 +1,19 @@
+from datetime import datetime
 from enum import Enum
+from typing import Optional
 
 from pydantic import BaseModel
 
 
 class ChatStreamRequest(BaseModel):
     message: str
+
+
+class ChatSession(BaseModel):
+    id: int
+    name: Optional[str]
+    user_id: int
+    ai_profile: str
 
 
 class ChatMessageRole(Enum):
@@ -14,8 +23,10 @@ class ChatMessageRole(Enum):
 
 
 class ChatMessage(BaseModel):
+    id: int
     role: ChatMessageRole
     content: str
+    timestamp: datetime
 
 
 class ChatConfig(BaseModel):
