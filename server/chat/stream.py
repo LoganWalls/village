@@ -21,20 +21,35 @@ class Message(BaseModel):
     content: str
 
 
-def format_prompt(messages: List[Message]) -> str:
+def format_prompt(
+    messages: List[Message],
+    user_prefix: str = "GPT4 Correct User: ",
+    assistant_prefix: str = "GPT4 Correct Assistant: ",
+    system_prefix: str = "",
+    suffix: str = "<|end_of_turn|>",
+) -> str:
     formatted = []
-    for m in messages + [Message(role=MessageRole.assistant, content="")]:
+    for m in messages + []:
+        prefix: str
         match m.role:
             case MessageRole.user:
-                formatted.append(f"GPT4 Correct User: {m.content}")
+                prefix = user_prefix
             case MessageRole.assistant:
-                formatted.append(f"GPT4 Correct Assistant: {m.content}")
+                prefix = assistant_prefix
             case MessageRole.system:
-                formatted.append(f"System: {m.content}")
+                prefix = system_prefix
+        formatted.append(f"{prefix}{m.content}{suffix}")
+    formatted.append(assistant_prefix)
     return "\n".join(formatted)
 
 
-messages: List[Message] = []
+# TODO: manage history per session
+messages: List[Message] = [
+    Message(
+        role=MessageRole.system,
+        content="You are a helpful assistant named Zephyr. You are capable, friendly, and not afraid to speak casually. You avoid long-winded answers, but provide details when the situation demands it. You always answer in English unless asked otherwise, and you always write code as markdown.",
+    )
+]
 
 
 async def stream_chat_message(message: str) -> AsyncIterable[str]:
@@ -46,7 +61,7 @@ async def stream_chat_message(message: str) -> AsyncIterable[str]:
         stream=True,
         prompt=prompt,
         max_tokens=2000,
-        stop=["<|end_of_turn|>"],
+        stop=["<|end_of_turn|>", "GPT4 Correct User: ", "GPT4 Correct Assistnant: "],
     )
 
     chunk: oai.Completion
