@@ -20,7 +20,9 @@
               poetry
               nodePackages.pnpm
             ];
-
+            nativeBuildInputs = with pkgs; [
+              pkg-config
+            ];
             LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath [
               pkgs.stdenv.cc.cc
             ];

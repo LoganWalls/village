@@ -1,61 +1,58 @@
-import asyncio
-from typing import AsyncIterable, Awaitable
+from enum import Enum
+from typing import AsyncIterable, List
 
-from langchain.callbacks import AsyncIteratorCallbackHandler
-from langchain.chains import LLMChain
-from langchain.chat_models import ChatOpenAI
-from langchain.memory import ConversationBufferWindowMemory
-from langchain.prompts import (
-    ChatPromptTemplate,
-    HumanMessagePromptTemplate,
-    MessagesPlaceholder,
-    SystemMessagePromptTemplate,
-)
+import openai as oai
+from pydantic.main import BaseModel
+
+oai.api_base = "http://localhost:7777/v1"
+oai.api_key = "sk-blah"
 
 __all__ = ["stream_chat_message"]
 
-# TODO: wrap this in a manager class instead of global
-oai_chat = ChatOpenAI(
-    openai_api_base="http://localhost:7777/v1",
-    openai_api_key="sk-blah",
-    max_tokens=2000,
-    streaming=True,
-)
-prompt = ChatPromptTemplate.from_messages(
-    [
-        SystemMessagePromptTemplate.from_template(
-            "You are a nice chatbot having a conversation with a human."
-        ),
-        # The `variable_name` here is what must align with memory
-        MessagesPlaceholder(variable_name="chat_history"),
-        HumanMessagePromptTemplate.from_template("{user_input}"),
-    ]
-)
-# Notice that we `return_messages=True` to fit into the MessagesPlaceholder
-# Notice that `"chat_history"` aligns with the MessagesPlaceholder name
-memory = ConversationBufferWindowMemory(
-    memory_key="chat_history", return_messages=True, k=2
-)
-conversation = LLMChain(llm=oai_chat, prompt=prompt, verbose=True, memory=memory)
+
+class MessageRole(Enum):
+    user = "user"
+    assistant = "assistant"
+    system = "system"
 
 
-async def wrap_iter(fn: Awaitable, event: asyncio.Event):
-    try:
-        await fn
-    except Exception as e:
-        print(f"Caught exception: {e}")
-    finally:
-        event.set()
+class Message(BaseModel):
+    role: MessageRole
+    content: str
+
+
+def format_prompt(messages: List[Message]) -> str:
+    formatted = []
+    for m in messages + [Message(role=MessageRole.assistant, content="")]:
+        match m.role:
+            case MessageRole.user:
+                formatted.append(f"GPT4 Correct User: {m.content}")
+            case MessageRole.assistant:
+                formatted.append(f"GPT4 Correct Assistant: {m.content}")
+            case MessageRole.system:
+                formatted.append(f"System: {m.content}")
+    return "\n".join(formatted)
+
+
+messages: List[Message] = []
 
 
 async def stream_chat_message(message: str) -> AsyncIterable[str]:
-    callback = AsyncIteratorCallbackHandler()
-    task = asyncio.create_task(
-        wrap_iter(
-            conversation.arun(dict(user_input=message), callbacks=[callback]),
-            callback.done,
-        ),
+    messages.append(Message(role=MessageRole.user, content=message))
+    prompt = format_prompt(messages)
+    print(prompt)
+    completion_resp = await oai.Completion.acreate(
+        model="open_chat",
+        stream=True,
+        prompt=prompt,
+        max_tokens=2000,
+        stop=["<|end_of_turn|>"],
     )
-    async for chunk in callback.aiter():
-        yield chunk
-    await task
+
+    chunk: oai.Completion
+    assistant_resp = ""
+    async for chunk in completion_resp:  # type: ignore
+        resp = chunk["choices"][0]["text"]
+        yield resp
+        assistant_resp += resp
+    messages.append(Message(role=MessageRole.assistant, content=assistant_resp))
