@@ -1,8 +1,9 @@
 from typing import AsyncIterable, List
 
 import openai as oai
+from aiosqlite import Connection
 
-from .database import Database
+from .database import insert_chat_message
 from .models import ChatConfig, ChatCoversation, ChatMessage, ChatRole
 
 __all__ = ["stream_model_response"]
@@ -33,7 +34,7 @@ chat_config = ChatConfig(
 
 
 async def stream_model_response(
-    db: Database,
+    db: Connection,
     conversation: ChatCoversation,
     history: list[ChatMessage],
 ) -> AsyncIterable[str]:
@@ -63,10 +64,12 @@ async def stream_model_response(
         yield resp
         ai_response += resp
 
-    await db.insert_chat_message(
+    await insert_chat_message(
+        db,
         ChatMessage(
             conversation_id=conversation.id,
             role=ChatRole.ai,
             content=ai_response,
-        )
+        ),
     )
+    await db.commit()

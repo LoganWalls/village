@@ -1,23 +1,25 @@
 from contextlib import asynccontextmanager
 
+import aiosqlite
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from fastapi.staticfiles import StaticFiles
 
 from . import chat, config, database
+from .database import fetchone_as, insert_chat_message, fetchall_as
 from .models import ChatCoversation, ChatMessage, ChatRole
 from .schemas import ChatStreamRequest
 
-db = database.Database()
+db: aiosqlite.Connection
 
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
-    await db.connect()
+    global db
+    db = await database.connect()
     yield
-    # Clean up the ML models and release the resources
-    await db.disconnect()
+    await db.close()
 
 
 app = FastAPI(lifespan=lifespan)
@@ -34,19 +36,19 @@ app.add_middleware(
 @app.post("/chat/stream")
 async def chat_stream(request: ChatStreamRequest):
     # Fetch the current conversation
-    conversation = await (
-        await db.execute(
+    cursor = await db.execute(
             "select * from chat_conversations where id = ? and profile_id = ?;",
             (request.conversation_id, request.profile_id),
         )
-    ).fetchone_as(ChatCoversation)
+    conversation = await fetchone_as(cursor, ChatCoversation)
     if not conversation:
         raise RuntimeError(
             f"Could not find conversation with id: {request.conversation_id}"
         )
 
     # Create the current message and save it to the database
-    await db.insert_chat_message(
+    await insert_chat_message(
+        db,
         ChatMessage(
             role=ChatRole.user,
             content=request.message,
@@ -56,8 +58,7 @@ async def chat_stream(request: ChatStreamRequest):
     await db.commit()
 
     # Fetch conversation history
-    history = await (
-        await db.execute(
+    cursor = await db.execute(
             """
         select c.id, timestamp, conversation_id, r.name as role, content
         from chat_messages as c
@@ -67,7 +68,7 @@ async def chat_stream(request: ChatStreamRequest):
         """,
             (conversation.id,),
         )
-    ).fetchall_as(ChatMessage)
+    history = await fetchall_as(cursor, ChatMessage)
 
     return StreamingResponse(
         chat.stream_model_response(db, conversation, history),
