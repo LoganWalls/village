@@ -7,7 +7,9 @@ from typing import Any, Callable, Iterable, Optional, Protocol, Type, TypeVar
 import sqlite_vss
 from pydantic import BaseModel
 
-T = TypeVar("T", bound=BaseModel)
+from ..chat.schemas import ChatRole
+
+AnyModel = TypeVar("AnyModel", bound=BaseModel)
 
 
 class PydanticCursor(sqlite3.Cursor):
@@ -16,24 +18,26 @@ class PydanticCursor(sqlite3.Cursor):
     """
 
     def factory_for(
-        self, model: Type[T]
-    ) -> Callable[[sqlite3.Cursor, Iterable[Any]], T]:
+        self, model: Type[AnyModel]
+    ) -> Callable[[sqlite3.Cursor, Iterable[Any]], AnyModel]:
         fields = [column[0] for column in self.description]
 
-        def factory(_, row: Iterable[Any]) -> T:
+        def factory(_, row: Iterable[Any]) -> AnyModel:
             return model(**{k: v for k, v in zip(fields, row)})
 
         return factory
 
-    def fetchmany_as(self, model: Type[T], size: Optional[int] = 1) -> list[T]:
+    def fetchmany_as(
+        self, model: Type[AnyModel], size: Optional[int] = 1
+    ) -> list[AnyModel]:
         self.row_factory = self.factory_for(model)
         return super().fetchmany(size)
 
-    def fetchall_as(self, model: Type[T]) -> list[T]:
+    def fetchall_as(self, model: Type[AnyModel]) -> list[AnyModel]:
         self.row_factory = self.factory_for(model)
         return super().fetchall()
 
-    def fetchone_as(self, model: Type[T]) -> list[T]:
+    def fetchone_as(self, model: Type[AnyModel]) -> list[AnyModel]:
         self.row_factory = self.factory_for(model)
         return super().fetchone()
 
@@ -51,13 +55,54 @@ class UsesPydanticCursor(Protocol):
         ...
 
 
+AnyModel = TypeVar("AnyModel", bound=BaseModel)
+
+
 class PydanticConnection(UsesPydanticCursor, sqlite3.Connection):
-    ...
+    @staticmethod
+    def placeholders(n: int) -> str:
+        return ",".join(["?"] * n)
+
+    def insert(self, table: str, model: BaseModel) -> PydanticCursor:
+        """
+        Insert a pydantic `model` into a SQL `table`
+        `**kwargs` are passed to `model.dict()`
+        """
+        keys, values = zip(*model.dict().items())
+        return self.execute(
+            f"""
+            insert into {table}({','.join(keys)})
+            values ({self.placeholders(len(keys))})
+            """,
+            values,
+        )
+
+    def insert_many(self, table: str, models: list[AnyModel], **kwargs) -> PydanticCursor:
+        """
+        Insert many pydantic `models` into a SQL `table`
+        `**kwargs` are passed to `model.dict()`
+        """
+        data = [m.dict(**kwargs) for m in models]
+        keys = data[0].keys()
+        return self.executemany(
+            f"""
+            insert into {table}({','.join(keys)})
+            values ({self.placeholders(len(keys))})
+            """,
+            [tuple(d[k] for k in keys) for d in data],
+        )
 
 
 def initialize(db: PydanticConnection):
     init_script = resources.read_text(__name__.rsplit(".", 1)[0], "init.sql")
     db.executescript(init_script)
+    db.executemany(
+        """
+        insert into chat_roles(name)
+        values (?);
+        """,
+        [(r.value,) for r in ChatRole],
+    )
 
 
 def connect(path: Optional[Path]) -> PydanticConnection:

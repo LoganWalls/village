@@ -5,7 +5,7 @@ import openai as oai
 
 from server.core.schemas import AIProfile
 
-from .schemas import ChatConfig, ChatMessage, ChatMessageRole
+from .schemas import ChatConfig, ChatMessage, ChatRole
 
 __all__ = ["stream_chat_message"]
 
@@ -15,11 +15,11 @@ def format_prompt(messages: List[ChatMessage], config: ChatConfig) -> str:
     for m in messages + []:
         prefix: str = ""
         match m.role:
-            case ChatMessageRole.user:
+            case ChatRole.user:
                 prefix = config.user_prefix
-            case ChatMessageRole.assistant:
+            case ChatRole.ai:
                 prefix = config.ai_prefix
-            case ChatMessageRole.system:
+            case ChatRole.system:
                 prefix = config.system_prefix
         formatted.append(f"{prefix}{m.content}{config.suffix}")
     formatted.append(config.ai_prefix)
@@ -38,7 +38,7 @@ profile = AIProfile(
 )
 messages: List[ChatMessage] = [
     ChatMessage(
-        role=ChatMessageRole.system,
+        role=ChatRole.system,
         content="You are a helpful assistant named Zephyr."
         " You are capable, friendly, and not afraid to speak casually."
         " You avoid long-winded answers, but provide details when the"
@@ -53,7 +53,7 @@ async def stream_chat_message(message: str) -> AsyncIterable[str]:
     if config is None:
         return
 
-    messages.append(ChatMessage(role=ChatMessageRole.user, content=message))
+    messages.append(ChatMessage(role=ChatRole.user, content=message))
     prompt = format_prompt(messages, config)
     completion_resp = await oai.Completion.acreate(
         model=profile.name,
@@ -69,4 +69,4 @@ async def stream_chat_message(message: str) -> AsyncIterable[str]:
         resp = chunk["choices"][0]["text"]
         yield resp
         assistant_resp += resp
-    messages.append(ChatMessage(role=ChatMessageRole.assistant, content=assistant_resp))
+    messages.append(ChatMessage(role=ChatRole.ai, content=assistant_resp))

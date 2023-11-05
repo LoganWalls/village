@@ -4,7 +4,7 @@ create table users (
   name text not null unique
 );
 
-create table chat_sessions (
+create table chat_conversations (
   id integer primary key,
   user_id integer not null,
   ai_profile text not null,
@@ -22,12 +22,12 @@ create table chat_roles(
 
 create table chat_messages (
   id integer primary key,
-  session_id integer not null,
+  conversation_id integer not null,
   role_id integer not null,
   content text not null,
   timestamp datetime default current_timestamp,
-  foreign key (session_id) 
-    references chat_sessions (id) 
+  foreign key (conversation_id) 
+    references chat_conversations (id) 
            on delete cascade 
            on update no action,
   foreign key (role_id) 
