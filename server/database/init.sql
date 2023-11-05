@@ -1,7 +1,8 @@
 begin;
 create table users (
   id integer primary key,
-  name text not null unique
+  name text not null unique,
+  session_id text unique
 );
 
 create table chat_conversations (
