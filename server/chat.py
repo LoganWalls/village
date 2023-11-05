@@ -1,13 +1,11 @@
-from pathlib import Path
 from typing import AsyncIterable, List
 
 import openai as oai
 
-from server.core.schemas import AIProfile
+from .database import Database
+from .models import ChatConfig, ChatCoversation, ChatMessage, ChatRole
 
-from .schemas import ChatConfig, ChatMessage, ChatRole
-
-__all__ = ["stream_chat_message"]
+__all__ = ["stream_model_response"]
 
 
 def format_prompt(messages: List[ChatMessage], config: ChatConfig) -> str:
@@ -26,18 +24,20 @@ def format_prompt(messages: List[ChatMessage], config: ChatConfig) -> str:
     return "\n".join(formatted)
 
 
-profile = AIProfile(
-    name="OChat",
-    weights_path=Path("~/Models/openchat_3.5.Q5_K_M.gguf").expanduser(),
-    chat_config=ChatConfig(
-        user_prefix="GPT4 Correct User: ",
-        ai_prefix="GPT4 Correct Assistant: ",
-        system_prefix="",
-        suffix="<|end_of_turn|>",
-    ),
+chat_config = ChatConfig(
+    user_prefix="GPT4 Correct User: ",
+    ai_prefix="GPT4 Correct Assistant: ",
+    system_prefix="",
+    suffix="<|end_of_turn|>",
 )
-messages: List[ChatMessage] = [
-    ChatMessage(
+
+
+async def stream_model_response(
+    db: Database,
+    conversation: ChatCoversation,
+    history: list[ChatMessage],
+) -> AsyncIterable[str]:
+    system_message = ChatMessage(
         role=ChatRole.system,
         content="You are a helpful assistant named Zephyr."
         " You are capable, friendly, and not afraid to speak casually."
@@ -45,28 +45,28 @@ messages: List[ChatMessage] = [
         " situation demands it. You always answer in English unless"
         " asked otherwise, and you always write code as markdown.",
     )
-]
 
-
-async def stream_chat_message(message: str) -> AsyncIterable[str]:
-    config = profile.chat_config
-    if config is None:
-        return
-
-    messages.append(ChatMessage(role=ChatRole.user, content=message))
-    prompt = format_prompt(messages, config)
+    prompt = format_prompt([system_message] + history, chat_config)
+    print(prompt)
     completion_resp = await oai.Completion.acreate(
-        model=profile.name,
+        model="OChat",
         stream=True,
         prompt=prompt,
         max_tokens=2000,
-        stop=[config.suffix, config.user_prefix, config.ai_prefix],
+        stop=[chat_config.suffix, chat_config.user_prefix, chat_config.ai_prefix],
     )
 
     chunk: oai.Completion
-    assistant_resp = ""
+    ai_response = ""
     async for chunk in completion_resp:  # type: ignore
         resp = chunk["choices"][0]["text"]
         yield resp
-        assistant_resp += resp
-    messages.append(ChatMessage(role=ChatRole.ai, content=assistant_resp))
+        ai_response += resp
+
+    await db.insert_chat_message(
+        ChatMessage(
+            conversation_id=conversation.id,
+            role=ChatRole.ai,
+            content=ai_response,
+        )
+    )

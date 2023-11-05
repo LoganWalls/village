@@ -1,5 +1,5 @@
 begin;
-create table users (
+create table profiles (
   id integer primary key,
   name text not null unique,
   session_id text unique
@@ -7,11 +7,10 @@ create table users (
 
 create table chat_conversations (
   id integer primary key,
-  user_id integer not null,
-  ai_profile text not null,
-  name text not null,
-  foreign key (user_id) 
-    references users (id) 
+  name text,
+  profile_id integer not null,
+  foreign key (profile_id) 
+    references profiles (id) 
            on delete cascade 
            on update no action
 );
