@@ -1,8 +1,13 @@
 import { onMount, type Component, createSignal, For } from "solid-js";
 import styles from "./ChatWindow.module.css";
-import { ChatMessage, ChatMessageData, ChatMessageStylesheets } from "./ChatMessage";
+import {
+  ChatMessage,
+  ChatMessageData,
+  ChatMessageStylesheets,
+} from "./ChatMessage";
+import { Profile } from "../api";
 
-const ChatWindow: Component = () => {
+const ChatWindow: Component<{ activeProfile: Profile }> = (props) => {
   // NOTE: We use column-reverse to handle automatic scrolling
   // when we display messages, so they are ordered as most-recent first.
   const [messages, setMessages] = createSignal<ChatMessageData[]>([]);
@@ -13,13 +18,14 @@ const ChatWindow: Component = () => {
       message: sentMessage,
     };
     setMessages((prev) => [sentData, ...prev]);
-
+    // TODO: use apiClient for this request once we figure out
+    // how to specify streaming responses in the schema
     const response = await fetch("http://localhost:8000/chat/stream", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ 
-        profile_id: 1,
-        conversation_id: 1,
+      body: JSON.stringify({
+        profile_id: props.activeProfile.id,
+        thread_id: 1,
         message: message,
       }),
     });
@@ -30,11 +36,13 @@ const ChatWindow: Component = () => {
         message: currentMessage,
       };
       setMessages((prev) => [currentData, ...prev]);
-      const reader = response.body.pipeThrough(new TextDecoderStream()).getReader()
+      const reader = response.body
+        .pipeThrough(new TextDecoderStream())
+        .getReader();
       while (true) {
-        const {done, value} = await reader.read();
-        if (done){
-          break
+        const { done, value } = await reader.read();
+        if (done) {
+          break;
         }
         for (let char of value) {
           setCurrentMessage((prev) => prev + char);
@@ -47,13 +55,13 @@ const ChatWindow: Component = () => {
 
   return (
     <>
-    <ChatMessageStylesheets/>
-    <div class={styles.ChatWindow}>
-      <div class={styles.chatHistory}>
-        <For each={messages()}>{(data) => <ChatMessage data={data} />}</For>
+      <ChatMessageStylesheets />
+      <div class={styles.ChatWindow}>
+        <div class={styles.chatHistory}>
+          <For each={messages()}>{(data) => <ChatMessage data={data} />}</For>
+        </div>
+        <InputBar sendMessage={sendMessage} />
       </div>
-      <InputBar sendMessage={sendMessage} />
-    </div>
     </>
   );
 };

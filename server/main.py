@@ -8,7 +8,7 @@ from fastapi.staticfiles import StaticFiles
 
 from . import chat, config, database
 from .database import fetchall_as, fetchone_as, insert_chat_message
-from .models import ChatThread, ChatMessage, ChatRole, Profile
+from .models import ChatMessage, ChatRole, ChatThread, Profile
 from .schemas import ChatStreamRequest
 
 db: aiosqlite.Connection
@@ -35,12 +35,22 @@ app.add_middleware(
 
 @app.get("/profiles")
 async def list_profiles() -> list[Profile]:
+    """List all user profiles"""
     cursor = await db.execute("select id, name from profiles")
     return await fetchall_as(cursor, Profile)
 
 
+@app.get("/profile/{profile_id}/threads")
+async def list_profile_threads(profile_id: int) -> list[ChatThread]:
+    """List all threads for a given user profile"""
+    cursor = await db.execute(
+        "select * from chat_threads where profile_id = ?;", (profile_id,)
+    )
+    return await fetchall_as(cursor, ChatThread)
+
+
 @app.post("/chat/stream")
-async def chat_stream(request: ChatStreamRequest):
+async def chat_stream(request: ChatStreamRequest) -> StreamingResponse:
     # Fetch the current thread
     cursor = await db.execute(
         "select * from chat_threads where id = ? and profile_id = ?;",
@@ -48,9 +58,7 @@ async def chat_stream(request: ChatStreamRequest):
     )
     thread = await fetchone_as(cursor, ChatThread)
     if not thread:
-        raise RuntimeError(
-            f"Could not find thread with id: {request.thread_id}"
-        )
+        raise RuntimeError(f"Could not find thread with id: {request.thread_id}")
 
     # Create the current message and save it to the database
     await insert_chat_message(

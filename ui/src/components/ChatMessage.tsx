@@ -11,8 +11,7 @@ import katexStyles from "../assets/katex.min.css?url";
 
 // Configure marked to highlight code
 const marked = new Marked(
-  // Put katex before highlight so that it can
-  // catch ```latex code blocks.
+  // Put katex before highlight so that it can catch ```latex code blocks.
   markedKatex({
     throwOnError: false,
   }),
@@ -65,8 +64,6 @@ export const ChatMessageStylesheets: Component = () => {
   );
 };
 
-// TODO: replace with pydantic-generated model?
-// How to handle signal?
 export interface ChatMessageData {
   role: "ai" | "user";
   message: Accessor<string>;

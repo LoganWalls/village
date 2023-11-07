@@ -6,12 +6,12 @@ from pydantic import BaseModel, Field
 
 
 class Profile(BaseModel):
-    id: Optional[int] = Field(default=None)
+    id: Optional[int] = Field(default=None, ge=1)
     name: str
 
 
 class ChatThread(BaseModel):
-    id: Optional[int] = Field(default=None)
+    id: Optional[int] = Field(default=None, ge=1)
     name: Optional[str] = Field(default=None)
     profile_id: int
 
@@ -23,9 +23,9 @@ class ChatRole(str, Enum):
 
 
 class ChatMessage(BaseModel):
-    id: Optional[int] = Field(default=None)
+    id: Optional[int] = Field(default=None, ge=1)
     timestamp: Optional[datetime] = Field(default=None)
-    thread_id: Optional[int] = Field(default=None)
+    thread_id: Optional[int] = Field(default=None, ge=1)
     role: ChatRole
     content: str
 
