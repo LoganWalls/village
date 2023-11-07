@@ -10,7 +10,7 @@ class Profile(BaseModel):
     name: str
 
 
-class ChatCoversation(BaseModel):
+class ChatThread(BaseModel):
     id: Optional[int] = Field(default=None)
     name: Optional[str] = Field(default=None)
     profile_id: int
@@ -25,7 +25,7 @@ class ChatRole(str, Enum):
 class ChatMessage(BaseModel):
     id: Optional[int] = Field(default=None)
     timestamp: Optional[datetime] = Field(default=None)
-    conversation_id: Optional[int] = Field(default=None)
+    thread_id: Optional[int] = Field(default=None)
     role: ChatRole
     content: str
 

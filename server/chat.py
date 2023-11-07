@@ -4,7 +4,7 @@ import openai as oai
 from aiosqlite import Connection
 
 from .database import insert_chat_message
-from .models import ChatConfig, ChatCoversation, ChatMessage, ChatRole
+from .models import ChatConfig, ChatThread, ChatMessage, ChatRole
 
 __all__ = ["stream_model_response"]
 
@@ -35,7 +35,7 @@ chat_config = ChatConfig(
 
 async def stream_model_response(
     db: Connection,
-    conversation: ChatCoversation,
+    thread: ChatThread,
     history: list[ChatMessage],
 ) -> AsyncIterable[str]:
     system_message = ChatMessage(
@@ -67,7 +67,7 @@ async def stream_model_response(
     await insert_chat_message(
         db,
         ChatMessage(
-            conversation_id=conversation.id,
+            thread_id=thread.id,
             role=ChatRole.ai,
             content=ai_response,
         ),

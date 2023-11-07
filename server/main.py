@@ -7,8 +7,8 @@ from fastapi.responses import StreamingResponse
 from fastapi.staticfiles import StaticFiles
 
 from . import chat, config, database
-from .database import fetchone_as, insert_chat_message, fetchall_as
-from .models import ChatCoversation, ChatMessage, ChatRole
+from .database import fetchall_as, fetchone_as, insert_chat_message
+from .models import ChatThread, ChatMessage, ChatRole, Profile
 from .schemas import ChatStreamRequest
 
 db: aiosqlite.Connection
@@ -33,17 +33,23 @@ app.add_middleware(
 )
 
 
+@app.get("/profiles")
+async def list_profiles() -> list[Profile]:
+    cursor = await db.execute("select id, name from profiles")
+    return await fetchall_as(cursor, Profile)
+
+
 @app.post("/chat/stream")
 async def chat_stream(request: ChatStreamRequest):
-    # Fetch the current conversation
+    # Fetch the current thread
     cursor = await db.execute(
-            "select * from chat_conversations where id = ? and profile_id = ?;",
-            (request.conversation_id, request.profile_id),
-        )
-    conversation = await fetchone_as(cursor, ChatCoversation)
-    if not conversation:
+        "select * from chat_threads where id = ? and profile_id = ?;",
+        (request.thread_id, request.profile_id),
+    )
+    thread = await fetchone_as(cursor, ChatThread)
+    if not thread:
         raise RuntimeError(
-            f"Could not find conversation with id: {request.conversation_id}"
+            f"Could not find thread with id: {request.thread_id}"
         )
 
     # Create the current message and save it to the database
@@ -52,26 +58,26 @@ async def chat_stream(request: ChatStreamRequest):
         ChatMessage(
             role=ChatRole.user,
             content=request.message,
-            conversation_id=conversation.id,
-        )
+            thread_id=thread.id,
+        ),
     )
     await db.commit()
 
-    # Fetch conversation history
+    # Fetch thread history
     cursor = await db.execute(
-            """
-        select c.id, timestamp, conversation_id, r.name as role, content
+        """
+        select c.id, timestamp, thread_id, r.name as role, content
         from chat_messages as c
         join chat_roles as r on c.role_id = r.id
-        where conversation_id = ?
+        where thread_id = ?
         order by timestamp;
         """,
-            (conversation.id,),
-        )
+        (thread.id,),
+    )
     history = await fetchall_as(cursor, ChatMessage)
 
     return StreamingResponse(
-        chat.stream_model_response(db, conversation, history),
+        chat.stream_model_response(db, thread, history),
         media_type="text/event-stream",
     )
 
