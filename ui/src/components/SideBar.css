@@ -1,0 +1,43 @@
+.side-bar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--size-1);
+  flex-basis: 25%;
+  padding: var(--size-fluid-1);
+  background-color: var(--surface-2);
+  height: 100%;
+  max-width: 0;
+  &.open {
+    max-width: unset;
+    animation: var(--animation-slide-in-right);
+    animation-duration: 0.3s;
+  }
+  transition: all 0.3s var(--ease-1);
+}
+
+.thread {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--size-2);
+  width: 100%;
+  padding: var(--size-1);
+  white-space: nowrap;
+  border-radius: var(--radius-2);
+  cursor: pointer;
+  &:hover {
+    background-color: var(--surface-3);
+  }
+  &.selected {
+    background-color: var(--brand);
+  }
+  transition: all 0.3s var(--ease-1);
+}
+
+.thread-icon {
+  --size: var(--font-size-2);
+  display: inline-block;
+  height: var(--size);
+  width: var(--size);
+  aspect-ratio: var(--ratio-square);
+}

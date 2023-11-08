@@ -5,6 +5,7 @@ import {
   For,
   createResource,
   createEffect,
+  Accessor,
 } from "solid-js";
 import {
   ChatMessage,
@@ -18,13 +19,13 @@ import "./ChatWindow.css";
 
 const ChatWindow: Component<{
   profile: Profile;
-  thread: ChatThread;
+  activeThread: Accessor<ChatThread | undefined>;
 }> = (props) => {
-  const { profile, thread } = props;
+  const { profile, activeThread } = props;
   // NOTE: We use column-reverse to handle automatic scrolling
   // when we display messages, so they are ordered as most-recent first.
   const [messages, setMessages] = createSignal<ChatMessageData[]>([]);
-  const [history] = createResource<ChatMessageData[]>(async () => {
+  const [history] = createResource(activeThread, async (thread) => {
     const response =
       await apiClient.default.threadHistoryThreadThreadIdHistoryGet(thread.id);
     return response
@@ -39,6 +40,10 @@ const ChatWindow: Component<{
   });
 
   const sendMessage = async (message: string) => {
+    const thread = activeThread();
+    if (!thread){
+      return;
+    }
     const [sentMessage] = createSignal(message);
     const sentData: ChatMessageData = {
       role: "user",
