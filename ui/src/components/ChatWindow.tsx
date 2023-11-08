@@ -6,7 +6,6 @@ import {
   createResource,
   createEffect,
 } from "solid-js";
-import styles from "./ChatWindow.module.css";
 import {
   ChatMessage,
   ChatMessageData,
@@ -15,6 +14,7 @@ import {
 } from "./ChatMessage";
 import { ChatThread, Profile } from "../api";
 import { apiClient } from "../client";
+import "./ChatWindow.css";
 
 const ChatWindow: Component<{
   profile: Profile;
@@ -83,8 +83,8 @@ const ChatWindow: Component<{
   return (
     <>
       <ChatMessageStylesheets />
-      <div class={styles.ChatWindow}>
-        <div class={styles.chatHistory}>
+      <div class="chat-window">
+        <div class="chat-history">
           <For each={messages().filter((m) => m.role !== "system")}>
             {(data) => <ChatMessage data={data} />}
           </For>
@@ -115,13 +115,13 @@ const InputBar: Component<{ sendMessage: (m: string) => void }> = (props) => {
   let sendButtonRef: HTMLButtonElement | undefined;
   let textInputRef: HTMLTextAreaElement | undefined;
   return (
-    <div class={styles.InputBar}>
+    <div class="input-bar">
       <textarea
         ref={textInputRef}
         rows="1"
         cols="80"
         placeholder="Type something here..."
-        class={styles.textInput}
+        class="text-input"
         name="message"
         onInput={(e) => {
           autosize(e.target);
@@ -137,7 +137,7 @@ const InputBar: Component<{ sendMessage: (m: string) => void }> = (props) => {
       ></textarea>
       <button
         ref={sendButtonRef}
-        class={styles.textSendButton}
+        class="text-send-button"
         type="submit"
         onClick={() => {
           props.sendMessage(content());
@@ -148,7 +148,7 @@ const InputBar: Component<{ sendMessage: (m: string) => void }> = (props) => {
         }}
         disabled={content() == ""}
       >
-        <div class={styles.textSendIcon}></div>
+        <div class="text-send-icon"></div>
       </button>
     </div>
   );

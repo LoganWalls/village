@@ -1,8 +1,5 @@
 @import "open-props/normalize";
 @import "open-props/style";
-/* Pulling this from a CDN because of a bug:
-* https://github.com/argyleink/open-props/issues/431#issue-1955952470 */
-@import "https://unpkg.com/open-props/animations.min.css";
 
 :root {
   /* Light theme */
@@ -40,7 +37,7 @@ textarea {
   transition: background-color 500ms var(--ease-1);
 }
 
-.App {
+.app {
   height: 100vh;
   display: flex;
   flex-direction: column;

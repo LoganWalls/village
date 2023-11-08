@@ -1,5 +1,5 @@
 import { type Component, createSignal, Accessor } from "solid-js";
-import styles from "./ChatMessage.module.css";
+import "./ChatMessage.css";
 import DOMPurify from "dompurify";
 import { Marked } from "marked";
 import { markedHighlight } from "marked-highlight";
@@ -36,9 +36,9 @@ export const ChatMessage: Component<{ data: ChatMessageData }> = (props) => {
   return (
     <div
       classList={{
-        [styles.ChatMessage]: true,
-        [styles.ai]: role == "ai",
-        [styles.user]: role == "user",
+        ["chat-message"]: true,
+        ai: role == "ai",
+        user: role == "user",
       }}
       innerHTML={markdown()}
     ></div>

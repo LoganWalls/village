@@ -1,4 +1,4 @@
-.ChatWindow {
+.chat-window {
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -6,7 +6,7 @@
   padding: 0 var(--size-fluid-1) var(--size-fluid-1) var(--size-fluid-1);
 }
 
-.chatHistory {
+.chat-history {
   display: flex;
   flex-grow: 8;
   padding: var(--size-fluid-2);
@@ -16,7 +16,7 @@
   overflow-y: scroll;
 }
 
-.InputBar {
+.input-bar {
   display: flex;
   flex-direction: row;
   align-content: center;
@@ -37,7 +37,7 @@
   transition-property: border-color, box-shadow;
 }
 
-.textInput {
+.text-input {
   display: flex;
   resize: none;
   overflow: scroll;
@@ -50,7 +50,7 @@
   }
 }
 
-.textSendIcon {
+.text-send-icon {
   --mask-url: url("../assets/send-icon.svg");
   height: var(--size-1);
   aspect-ratio: var(--ratio-square);
@@ -62,11 +62,11 @@
   background-color: var(--surface-2);
 }
 
-.textSendButton:not([disabled]) > .textSendIcon {
+.text-send-button:not([disabled]) > .text-send-icon {
   background: var(--ai-gradient);
 }
 
-.textSendButton {
+.text-send-button {
   --button-border: var(--border-size-2);
   position: relative;
   background-color: var(--surface-1);

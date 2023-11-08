@@ -9,7 +9,7 @@ code {
   border-radius: var(--radius-2);
 }
 
-.ChatMessage {
+.chat-message {
   display: flex;
   flex-direction: column;
   width: fit-content;

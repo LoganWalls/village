@@ -1,6 +1,6 @@
 import { createSignal, type Component, Show, createResource, createEffect } from "solid-js";
 
-import styles from "./App.module.css";
+import "./App.css";
 import ChatWindow from "./components/ChatWindow";
 import { ChatThread, Profile } from "./api";
 import ProfileSelect from "./components/ProfileSelect";
@@ -21,7 +21,7 @@ const App: Component = () => {
 
 
   return (
-    <div class={styles.App}>
+    <div class="app">
       <Show when={activeProfile()} fallback={<ProfileSelect setActiveProfile={setActiveProfile}/>}>
         <Show when={activeThread()} fallback={<p>Loading</p>}>
           <ChatWindow profile={activeProfile()!} thread={activeThread()!} />
