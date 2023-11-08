@@ -4,7 +4,7 @@ import openai as oai
 from aiosqlite import Connection
 
 from .database import insert_chat_message
-from .models import ChatConfig, ChatThread, ChatMessage, ChatRole
+from .models import ChatConfig, ChatMessage, ChatRole, ChatThread
 
 __all__ = ["stream_model_response"]
 
@@ -26,10 +26,10 @@ def format_prompt(messages: List[ChatMessage], config: ChatConfig) -> str:
 
 
 chat_config = ChatConfig(
-    user_prefix="GPT4 Correct User: ",
-    ai_prefix="GPT4 Correct Assistant: ",
-    system_prefix="",
-    suffix="<|end_of_turn|>",
+    user_prefix="<|im_start|>\nuser",
+    ai_prefix="<|im_start|>\nassistant",
+    system_prefix="<|im_start|>\nsystem",
+    suffix="<|im_end|>",
 )
 
 
@@ -50,7 +50,7 @@ async def stream_model_response(
     prompt = format_prompt([system_message] + history, chat_config)
     print(prompt)
     completion_resp = await oai.Completion.acreate(
-        model="OChat",
+        model="DolphinMistral",
         stream=True,
         prompt=prompt,
         max_tokens=2000,

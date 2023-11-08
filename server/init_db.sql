@@ -1,8 +1,7 @@
 begin;
 create table profiles (
   id integer primary key,
-  name text not null unique,
-  session_id text unique
+  name text not null unique
 );
 
 create table chat_threads (

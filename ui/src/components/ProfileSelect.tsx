@@ -14,7 +14,7 @@ const ProfileSelect: Component<{ setActiveProfile: Setter<Profile> }> = (
   props,
 ) => {
   const [profiles] = createResource(async () => {
-    return await apiClient.default.listProfilesProfilesGet();
+    return await apiClient.default.profilesProfilesGet();
   });
   return (
     <div class="profile-select">
@@ -34,7 +34,6 @@ const ProfileSelect: Component<{ setActiveProfile: Setter<Profile> }> = (
                   clipRule="evenodd"
                 />
               </svg>
-
               <p>{p.name}</p>
             </div>
           )}

@@ -69,20 +69,20 @@ async def initialize(db: Connection):
         """,
         [(r.value,) for r in ChatRole],
     )
-    test_user_name = "test"
-    await db.execute(
+    test_profiles = [("Test Profile",), ("Alternative Profile",)]
+    await db.executemany(
         """
         insert into profiles(name)
         values (?);
         """,
-        (test_user_name,),
+        test_profiles,
     )
-    await db.execute(
+    await db.executemany(
         """
         insert into chat_threads(profile_id)
         values ((select id from profiles where name = ?));
         """,
-        (test_user_name,),
+        test_profiles + test_profiles,  # insert two threads per profile
     )
     await db.commit()
 

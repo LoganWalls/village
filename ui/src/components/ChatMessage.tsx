@@ -65,12 +65,12 @@ export const ChatMessageStylesheets: Component = () => {
 };
 
 export interface ChatMessageData {
-  role: "ai" | "user";
+  role: "ai" | "user" | "system";
   message: Accessor<string>;
 }
 
 export function messageDataFromString(
-  role: "ai" | "user",
+  role: "ai" | "user" | "system",
   message: string,
 ): ChatMessageData {
   const [messageSignal] = createSignal(message);

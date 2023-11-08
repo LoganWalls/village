@@ -1,16 +1,39 @@
-import { onMount, type Component, createSignal, For } from "solid-js";
+import { onMount, type Component, createSignal, For, createResource, createEffect } from "solid-js";
 import styles from "./ChatWindow.module.css";
 import {
   ChatMessage,
   ChatMessageData,
   ChatMessageStylesheets,
+  messageDataFromString,
 } from "./ChatMessage";
-import { Profile } from "../api";
+import { ChatThread, Profile } from "../api";
+import { apiClient } from "../client";
 
-const ChatWindow: Component<{ activeProfile: Profile }> = (props) => {
+const ChatWindow: Component<{
+  profile: Profile;
+  thread: ChatThread;
+}> = (props) => {
+  const {profile, thread} = props;
+  if (!profile.id){
+    throw `Profile "${profile.name}" is missing id`;
+  }
+  if (!thread.id){
+    throw `Thread "${thread.name}" is missing id`;
+  }
+  const [messages, setMessages] = createSignal<ChatMessageData[]>([]);
+  const [history] = createResource<ChatMessageData[]>(async () => {
+    const response = await apiClient.default.threadHistoryThreadThreadIdHistoryGet(thread.id!);
+    return response.map(m => messageDataFromString(m.role, m.content));
+  });
+  createEffect(() => {
+    const h = history();
+    if (h){
+      setMessages(h);
+    }
+  })
   // NOTE: We use column-reverse to handle automatic scrolling
   // when we display messages, so they are ordered as most-recent first.
-  const [messages, setMessages] = createSignal<ChatMessageData[]>([]);
+
   const sendMessage = async (message: string) => {
     const [sentMessage] = createSignal(message);
     const sentData: ChatMessageData = {
@@ -24,8 +47,8 @@ const ChatWindow: Component<{ activeProfile: Profile }> = (props) => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        profile_id: props.activeProfile.id,
-        thread_id: 1,
+        profile_id: profile.id,
+        thread_id: thread.id,
         message: message,
       }),
     });

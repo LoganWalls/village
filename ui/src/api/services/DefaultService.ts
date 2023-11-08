@@ -2,6 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { ChatMessage } from '../models/ChatMessage';
 import type { ChatStreamRequest } from '../models/ChatStreamRequest';
 import type { ChatThread } from '../models/ChatThread';
 import type { Profile } from '../models/Profile';
@@ -14,12 +15,12 @@ export class DefaultService {
     constructor(public readonly httpRequest: BaseHttpRequest) {}
 
     /**
-     * List Profiles
+     * Profiles
      * List all user profiles
      * @returns Profile Successful Response
      * @throws ApiError
      */
-    public listProfilesProfilesGet(): CancelablePromise<Array<Profile>> {
+    public profilesProfilesGet(): CancelablePromise<Array<Profile>> {
         return this.httpRequest.request({
             method: 'GET',
             url: '/profiles',
@@ -27,13 +28,13 @@ export class DefaultService {
     }
 
     /**
-     * List Profile Threads
+     * Profile Threads
      * List all threads for a given user profile
      * @param profileId
      * @returns ChatThread Successful Response
      * @throws ApiError
      */
-    public listProfileThreadsProfileProfileIdThreadsGet(
+    public profileThreadsProfileProfileIdThreadsGet(
         profileId: number,
     ): CancelablePromise<Array<ChatThread>> {
         return this.httpRequest.request({
@@ -41,6 +42,28 @@ export class DefaultService {
             url: '/profile/{profile_id}/threads',
             path: {
                 'profile_id': profileId,
+            },
+            errors: {
+                422: `Validation Error`,
+            },
+        });
+    }
+
+    /**
+     * Thread History
+     * List all threads for a given user profile
+     * @param threadId
+     * @returns ChatMessage Successful Response
+     * @throws ApiError
+     */
+    public threadHistoryThreadThreadIdHistoryGet(
+        threadId: number,
+    ): CancelablePromise<Array<ChatMessage>> {
+        return this.httpRequest.request({
+            method: 'GET',
+            url: '/thread/{thread_id}/history',
+            path: {
+                'thread_id': threadId,
             },
             errors: {
                 422: `Validation Error`,

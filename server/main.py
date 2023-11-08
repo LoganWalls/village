@@ -34,19 +34,34 @@ app.add_middleware(
 
 
 @app.get("/profiles")
-async def list_profiles() -> list[Profile]:
+async def profiles() -> list[Profile]:
     """List all user profiles"""
     cursor = await db.execute("select id, name from profiles")
     return await fetchall_as(cursor, Profile)
 
 
 @app.get("/profile/{profile_id}/threads")
-async def list_profile_threads(profile_id: int) -> list[ChatThread]:
+async def profile_threads(profile_id: int) -> list[ChatThread]:
     """List all threads for a given user profile"""
     cursor = await db.execute(
         "select * from chat_threads where profile_id = ?;", (profile_id,)
     )
     return await fetchall_as(cursor, ChatThread)
+
+
+@app.get("/thread/{thread_id}/history")
+async def thread_history(thread_id: int) -> list[ChatMessage]:
+    """List all threads for a given user profile"""
+    cursor = await db.execute(
+        """
+        select c.*, r.name as role 
+        from chat_messages as c
+        join chat_roles as r on c.role_id = r.id
+        where thread_id = ?;
+        """,
+        (thread_id,),
+    )
+    return await fetchall_as(cursor, ChatMessage)
 
 
 @app.post("/chat/stream")
