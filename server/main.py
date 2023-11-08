@@ -8,7 +8,7 @@ from fastapi.staticfiles import StaticFiles
 
 from . import chat, config, database
 from .database import fetchall_as, fetchone_as, insert_chat_message
-from .models import ChatMessage, ChatRole, ChatThread, Profile
+from .models import ChatMessage, ChatRole, ChatThread, Profile, SavedChatMessage
 from .schemas import ChatStreamRequest
 
 db: aiosqlite.Connection
@@ -50,7 +50,7 @@ async def profile_threads(profile_id: int) -> list[ChatThread]:
 
 
 @app.get("/thread/{thread_id}/history")
-async def thread_history(thread_id: int) -> list[ChatMessage]:
+async def thread_history(thread_id: int) -> list[SavedChatMessage]:
     """List all threads for a given user profile"""
     cursor = await db.execute(
         """
@@ -61,7 +61,7 @@ async def thread_history(thread_id: int) -> list[ChatMessage]:
         """,
         (thread_id,),
     )
-    return await fetchall_as(cursor, ChatMessage)
+    return await fetchall_as(cursor, SavedChatMessage)
 
 
 @app.post("/chat/stream")
@@ -77,12 +77,7 @@ async def chat_stream(request: ChatStreamRequest) -> StreamingResponse:
 
     # Create the current message and save it to the database
     await insert_chat_message(
-        db,
-        ChatMessage(
-            role=ChatRole.user,
-            content=request.message,
-            thread_id=thread.id,
-        ),
+        db, thread.id, ChatMessage(role=ChatRole.user, content=request.message)
     )
     await db.commit()
 
@@ -97,7 +92,7 @@ async def chat_stream(request: ChatStreamRequest) -> StreamingResponse:
         """,
         (thread.id,),
     )
-    history = await fetchall_as(cursor, ChatMessage)
+    history = await fetchall_as(cursor, SavedChatMessage)
 
     return StreamingResponse(
         chat.stream_model_response(db, thread, history),

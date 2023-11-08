@@ -1,4 +1,11 @@
-import { onMount, type Component, createSignal, For, createResource, createEffect } from "solid-js";
+import {
+  onMount,
+  type Component,
+  createSignal,
+  For,
+  createResource,
+  createEffect,
+} from "solid-js";
 import styles from "./ChatWindow.module.css";
 import {
   ChatMessage,
@@ -13,26 +20,23 @@ const ChatWindow: Component<{
   profile: Profile;
   thread: ChatThread;
 }> = (props) => {
-  const {profile, thread} = props;
-  if (!profile.id){
-    throw `Profile "${profile.name}" is missing id`;
-  }
-  if (!thread.id){
-    throw `Thread "${thread.name}" is missing id`;
-  }
+  const { profile, thread } = props;
+  // NOTE: We use column-reverse to handle automatic scrolling
+  // when we display messages, so they are ordered as most-recent first.
   const [messages, setMessages] = createSignal<ChatMessageData[]>([]);
   const [history] = createResource<ChatMessageData[]>(async () => {
-    const response = await apiClient.default.threadHistoryThreadThreadIdHistoryGet(thread.id!);
-    return response.map(m => messageDataFromString(m.role, m.content));
+    const response =
+      await apiClient.default.threadHistoryThreadThreadIdHistoryGet(thread.id);
+    return response
+      .map((m) => messageDataFromString(m.role, m.content))
+      .reverse();
   });
   createEffect(() => {
     const h = history();
-    if (h){
+    if (h) {
       setMessages(h);
     }
-  })
-  // NOTE: We use column-reverse to handle automatic scrolling
-  // when we display messages, so they are ordered as most-recent first.
+  });
 
   const sendMessage = async (message: string) => {
     const [sentMessage] = createSignal(message);
@@ -81,7 +85,9 @@ const ChatWindow: Component<{
       <ChatMessageStylesheets />
       <div class={styles.ChatWindow}>
         <div class={styles.chatHistory}>
-          <For each={messages()}>{(data) => <ChatMessage data={data} />}</For>
+          <For each={messages().filter((m) => m.role !== "system")}>
+            {(data) => <ChatMessage data={data} />}
+          </For>
         </div>
         <InputBar sendMessage={sendMessage} />
       </div>

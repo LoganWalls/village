@@ -4,8 +4,9 @@
 /* eslint-disable */
 
 export type ChatThread = {
-    id?: (number | null);
-    name?: (string | null);
+    id: number;
+    timestamp: string;
+    name?: string;
     profile_id: number;
 };
 

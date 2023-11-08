@@ -5,11 +5,11 @@
 
 import type { ChatRole } from './ChatRole';
 
-export type ChatMessage = {
-    id?: (number | null);
-    timestamp?: (string | null);
-    thread_id?: (number | null);
+export type SavedChatMessage = {
     role: ChatRole;
     content: string;
+    id: number;
+    timestamp: string;
+    thread_id: number;
 };
 

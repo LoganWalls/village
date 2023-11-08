@@ -10,12 +10,12 @@ export { CancelablePromise, CancelError } from './core/CancelablePromise';
 export { OpenAPI } from './core/OpenAPI';
 export type { OpenAPIConfig } from './core/OpenAPI';
 
-export type { ChatMessage } from './models/ChatMessage';
 export { ChatRole } from './models/ChatRole';
 export type { ChatStreamRequest } from './models/ChatStreamRequest';
 export type { ChatThread } from './models/ChatThread';
 export type { HTTPValidationError } from './models/HTTPValidationError';
 export type { Profile } from './models/Profile';
+export type { SavedChatMessage } from './models/SavedChatMessage';
 export type { ValidationError } from './models/ValidationError';
 
 export { DefaultService } from './services/DefaultService';

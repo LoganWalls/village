@@ -10,9 +10,6 @@ const App: Component = () => {
   const [activeProfile, setActiveProfile] = createSignal<Profile>();
   const [activeThread, setActiveThread] = createSignal<ChatThread>();
   const [threads] = createResource(activeProfile, async (profile) => {
-    if (!profile.id){
-      throw `profile "${profile.name}" has no id!`;
-    }
     return await apiClient.default.profileThreadsProfileProfileIdThreadsGet(profile.id);
   });
   createEffect(() => {

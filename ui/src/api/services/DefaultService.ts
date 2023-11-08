@@ -2,10 +2,10 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { ChatMessage } from '../models/ChatMessage';
 import type { ChatStreamRequest } from '../models/ChatStreamRequest';
 import type { ChatThread } from '../models/ChatThread';
 import type { Profile } from '../models/Profile';
+import type { SavedChatMessage } from '../models/SavedChatMessage';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
@@ -53,12 +53,12 @@ export class DefaultService {
      * Thread History
      * List all threads for a given user profile
      * @param threadId
-     * @returns ChatMessage Successful Response
+     * @returns SavedChatMessage Successful Response
      * @throws ApiError
      */
     public threadHistoryThreadThreadIdHistoryGet(
         threadId: number,
-    ): CancelablePromise<Array<ChatMessage>> {
+    ): CancelablePromise<Array<SavedChatMessage>> {
         return this.httpRequest.request({
             method: 'GET',
             url: '/thread/{thread_id}/history',

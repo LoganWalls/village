@@ -42,15 +42,14 @@ async def fetchone_as(cursor: Cursor, model: Type[AnyModel]) -> AnyModel | None:
     return await cursor.fetchone()  # type: ignore
 
 
-async def insert_chat_message(db: Connection, message: ChatMessage) -> Optional[int]:
+async def insert_chat_message(db: Connection, thread_id: int, message: ChatMessage) -> Optional[int]:
     """Inserts a new chat message into the database and returns its id"""
-    assert message.thread_id is not None, "Message must have a thread_id!"
     result = await db.execute_insert(
         """
     insert into chat_messages(thread_id, content, role_id)
     values (?, ?, (select id from chat_roles where name = ?))
     """,
-        (message.thread_id, message.content, message.role.value),
+        (thread_id, message.content, message.role.value),
     )
     return result[0] if result else None
 

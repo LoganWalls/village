@@ -4,7 +4,7 @@
 /* eslint-disable */
 
 export type Profile = {
-    id?: (number | null);
+    id: number;
     name: string;
 };
 

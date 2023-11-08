@@ -6,7 +6,8 @@ create table profiles (
 
 create table chat_threads (
   id integer primary key,
-  name text,
+  timestamp datetime default current_timestamp,
+  name text not null default "New thread",
   profile_id integer not null,
   foreign key (profile_id) 
     references profiles (id) 

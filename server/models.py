@@ -1,18 +1,18 @@
 from datetime import datetime
 from enum import Enum
-from typing import Optional
 
 from pydantic import BaseModel, Field
 
 
 class Profile(BaseModel):
-    id: Optional[int] = Field(default=None, ge=1)
+    id: int
     name: str
 
 
 class ChatThread(BaseModel):
-    id: Optional[int] = Field(default=None, ge=1)
-    name: Optional[str] = Field(default=None)
+    id: int
+    timestamp: datetime
+    name: str = Field(default="New thread")
     profile_id: int
 
 
@@ -23,11 +23,14 @@ class ChatRole(str, Enum):
 
 
 class ChatMessage(BaseModel):
-    id: Optional[int] = Field(default=None, ge=1)
-    timestamp: Optional[datetime] = Field(default=None)
-    thread_id: Optional[int] = Field(default=None, ge=1)
     role: ChatRole
     content: str
+
+
+class SavedChatMessage(ChatMessage):
+    id: int
+    timestamp: datetime
+    thread_id: int
 
 
 class ChatConfig(BaseModel):
