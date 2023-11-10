@@ -41,7 +41,7 @@ export const ChatMessage: Component<{ data: ChatMessageData }> = (props) => {
       button.classList.add("copy-button");
       button.addEventListener("click", () => {
         navigator.clipboard.writeText(codeText);
-        setTimeout(() => button.blur(), 2000);
+        setTimeout(() => button.blur(), 1000);
       });
       code.appendChild(button);
     }

@@ -7,9 +7,6 @@ code {
   position: relative;
   width: 100%;
   border-radius: var(--radius-2);
-  & > .copy-button {
-    opacity: 0;
-  }
   &:hover > .copy-button:not(:focus) {
     opacity: 0.5;
   }
@@ -25,17 +22,18 @@ code {
   width: auto;
   border: var(--border-size-1) solid var(--surface-2);
   background-color: var(--text-1);
+  opacity: 0;
   --mask-url: url("../assets/copy-icon.svg");
   mask: var(--mask-url);
   -webkit-mask: var(--mask-url);
   transition: all 0.3s var(--ease-1);
   &:active,
   &:focus {
+    animation: var(--animation-pulse);
+    animation-duration: 0.5s;
+    animation-iteration-count: 1;
     outline: none;
     opacity: 1;
-    animation: var(--animation-bounce) forwards;
-    animation-duration: 1s;
-    animation-iteration-count: 1;
   }
 }
 

@@ -3,15 +3,15 @@
 
 :root {
   /* Light theme */
-  --user-color: var(--cyan-2);
+  --user-color: var(--green-2);
   --ai-color: var(--violet-2);
   --ai-gradient: var(--gradient-26) var(--ai-color);
 
   /* Dark theme */
   @media (prefers-color-scheme: dark) {
-    --user-color: var(--cyan-9);
+    --user-color: var(--green-9);
     --ai-color: var(--violet-9);
-    --ai-gradient: var(--gradient-17) var(--ai-color);
+    --ai-gradient: var(--gradient-29) var(--ai-color);
   }
 
   /* Common */

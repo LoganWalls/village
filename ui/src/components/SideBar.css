@@ -29,7 +29,7 @@
     background-color: var(--surface-3);
   }
   &.selected {
-    background-color: var(--brand);
+    background-color: var(--surface-3);
   }
   transition: all 0.3s var(--ease-1);
 }
