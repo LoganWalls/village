@@ -51,15 +51,15 @@
 }
 
 .text-send-icon {
-  --mask-url: url("../assets/send-icon.svg");
   height: var(--size-1);
   aspect-ratio: var(--ratio-square);
   padding: var(--size-2);
-  mask: var(--mask-url);
-  -webkit-mask: var(--mask-url);
-  background-size: 400% 400%;
   animation: var(--ai-gradient-animation);
   background-color: var(--surface-2);
+  background-size: 400% 400%;
+  --mask-url: url("../assets/send-icon.svg");
+  mask: var(--mask-url);
+  -webkit-mask: var(--mask-url);
 }
 
 .text-send-button:not([disabled]) > .text-send-icon {
