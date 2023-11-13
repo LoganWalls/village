@@ -4,6 +4,7 @@
 /* eslint-disable */
 import type { ChatStreamRequest } from '../models/ChatStreamRequest';
 import type { ChatThread } from '../models/ChatThread';
+import type { NewThreadRequest } from '../models/NewThreadRequest';
 import type { Profile } from '../models/Profile';
 import type { SavedChatMessage } from '../models/SavedChatMessage';
 
@@ -50,6 +51,28 @@ export class DefaultService {
     }
 
     /**
+     * New Threads
+     * List all threads for a given user profile
+     * @param profileId
+     * @returns ChatThread Successful Response
+     * @throws ApiError
+     */
+    public newThreadsProfileProfileIdThreadsNewPost(
+        profileId: number,
+    ): CancelablePromise<Array<ChatThread>> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/profile/{profile_id}/threads/new',
+            path: {
+                'profile_id': profileId,
+            },
+            errors: {
+                422: `Validation Error`,
+            },
+        });
+    }
+
+    /**
      * Thread History
      * List all threads for a given user profile
      * @param threadId
@@ -65,6 +88,27 @@ export class DefaultService {
             path: {
                 'thread_id': threadId,
             },
+            errors: {
+                422: `Validation Error`,
+            },
+        });
+    }
+
+    /**
+     * New Thread
+     * List all threads for a given user profile
+     * @param requestBody
+     * @returns number Successful Response
+     * @throws ApiError
+     */
+    public newThreadThreadsNewPost(
+        requestBody: NewThreadRequest,
+    ): CancelablePromise<number> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/threads/new',
+            body: requestBody,
+            mediaType: 'application/json',
             errors: {
                 422: `Validation Error`,
             },

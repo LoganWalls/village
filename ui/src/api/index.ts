@@ -14,6 +14,7 @@ export { ChatRole } from './models/ChatRole';
 export type { ChatStreamRequest } from './models/ChatStreamRequest';
 export type { ChatThread } from './models/ChatThread';
 export type { HTTPValidationError } from './models/HTTPValidationError';
+export type { NewThreadRequest } from './models/NewThreadRequest';
 export type { Profile } from './models/Profile';
 export type { SavedChatMessage } from './models/SavedChatMessage';
 export type { ValidationError } from './models/ValidationError';

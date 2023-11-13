@@ -1,15 +1,20 @@
-import { Component, For, Resource, Setter, Signal } from "solid-js";
-import { ChatThread } from "../api";
+import { Component, For } from "solid-js";
 import "./SideBar.css";
+import { apiClient } from "../client";
+import { useAppState } from "../state";
 
-export const SideBar: Component<{
-  threads: Resource<ChatThread[]>;
-  activeThread: Signal<ChatThread | undefined>;
-}> = (props) => {
+export const SideBar: Component = () => {
   const {
-    threads,
+    activeProfile: [activeProfile],
     activeThread: [activeThread, setActiveThread],
-  } = props;
+    threads: [threads, refetchThreads],
+  } = useAppState();
+  const newThread = async () => {
+    await apiClient.default.newThreadThreadsNewPost({
+      profile_id: activeProfile()!.id,
+    });
+    await refetchThreads();
+  };
   return (
     <div class="side-bar open">
       <For each={threads()}>
@@ -35,6 +40,9 @@ export const SideBar: Component<{
           </div>
         )}
       </For>
+      <div onClick={newThread} class="thread" style="justify-content: center;">
+        +
+      </div>
     </div>
   );
 };

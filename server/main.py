@@ -9,7 +9,7 @@ from fastapi.staticfiles import StaticFiles
 from . import chat, config, database
 from .database import fetchall_as, fetchone_as, insert_chat_message
 from .models import ChatMessage, ChatRole, ChatThread, Profile, SavedChatMessage
-from .schemas import ChatStreamRequest
+from .schemas import ChatStreamRequest, NewThreadRequest
 
 db: aiosqlite.Connection
 
@@ -49,6 +49,15 @@ async def profile_threads(profile_id: int) -> list[ChatThread]:
     return await fetchall_as(cursor, ChatThread)
 
 
+@app.post("/profile/{profile_id}/threads/new")
+async def new_threads(profile_id: int) -> list[ChatThread]:
+    """List all threads for a given user profile"""
+    cursor = await db.execute(
+        "select * from chat_threads where profile_id = ?;", (profile_id,)
+    )
+    return await fetchall_as(cursor, ChatThread)
+
+
 @app.get("/thread/{thread_id}/history")
 async def thread_history(thread_id: int) -> list[SavedChatMessage]:
     """List all threads for a given user profile"""
@@ -62,6 +71,21 @@ async def thread_history(thread_id: int) -> list[SavedChatMessage]:
         (thread_id,),
     )
     return await fetchall_as(cursor, SavedChatMessage)
+
+
+@app.post("/threads/new")
+async def new_thread(request: NewThreadRequest) -> int:
+    """List all threads for a given user profile"""
+    thread_id = await db.execute_insert(
+        """
+        insert into chat_threads(profile_id)
+        values (?)
+        """,
+        (request.profile_id,),
+    )
+    if thread_id is None:
+        raise RuntimeError("Problem creating new thread")
+    return thread_id[0]
 
 
 @app.post("/chat/stream")
