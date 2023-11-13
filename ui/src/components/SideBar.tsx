@@ -19,7 +19,7 @@ export const SideBar: Component = () => {
   return (
     <div class="side-bar-container">
       <div classList={{ "side-bar": true, open: open() }}>
-        <div style="font-size: var(--font-size-fluid-1);">Threads</div>
+        <div class="threads-header">Threads</div>
         <For each={threads()}>
           {(t) => (
             <div
@@ -54,7 +54,10 @@ export const SideBar: Component = () => {
           +
         </div>
       </div>
-      <button onClick={() => setOpen((prev) => !prev)} classList={{"side-bar-button": true, open: open()}}>
+      <button
+        onClick={() => setOpen((prev) => !prev)}
+        classList={{ "side-bar-button": true, open: open() }}
+      >
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
