@@ -1,18 +1,32 @@
+:root {
+  --transition: all 0.3s var(--ease-1);
+}
+
+.side-bar-container {
+  display: flex;
+  position: relative;
+  flex-direction: row;
+  height: 100%;
+  overflow-x: visible;
+}
+
 .side-bar {
   display: flex;
+  position: relative;
   flex-direction: column;
   gap: var(--size-1);
-  flex-basis: 25%;
-  padding: var(--size-fluid-1);
+  flex-basis: 100%;
   background-color: var(--surface-2);
   height: 100%;
-  max-width: 0;
+  width: 0;
+  overflow-x: hidden;
   &.open {
-    max-width: unset;
+    padding: var(--size-fluid-1);
+    width: 20vw;
     animation: var(--animation-slide-in-right);
     animation-duration: 0.3s;
   }
-  transition: all 0.3s var(--ease-1);
+  transition: var(--transition);
 }
 
 .thread {
@@ -31,7 +45,7 @@
   &.selected {
     background-color: var(--surface-3);
   }
-  transition: all 0.3s var(--ease-1);
+  transition: var(--transition);
 }
 
 .thread-icon {
@@ -40,4 +54,29 @@
   height: var(--size);
   width: var(--size);
   aspect-ratio: var(--ratio-square);
+}
+
+.side-bar-button {
+  --size: var(--font-size-fluid-2);
+  position: absolute;
+  height: var(--size);
+  aspect-ratio: var(--ratio-square);
+  background-color: transparent;
+  top: 0%;
+  left: 100%;
+  &.open {
+    left: calc(100% - var(--size));
+  }
+  transition: var(--transition);
+}
+
+.side-bar-icon {
+  height: 100%;
+  aspect-ratio: var(--ratio-square);
+  transition: var(--transition);
+}
+
+.side-bar-button.open > .side-bar-icon > path {
+  d: path("M6 18L18 6M6 6l12 12");
+  transition: var(--transition);
 }
